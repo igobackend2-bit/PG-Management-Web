@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { RightPanel } from "../RightPanel/RightPanel";
 import { ToolBar } from "../ToolBar/ToolBar";
 import { RoomsListView } from "../RoomsListView/RoomsListView";
@@ -9,7 +10,7 @@ import IconPlusCircle from "../UIComponents/Icons/IconPlusCircle";
 import IconCaretDown from "../UIComponents/Icons/IconCaretDown";
 import IconCheckBoxChecked from "../UIComponents/Icons/IconCheckBoxChecked";
 import IconCheckBoxUnchecked from "../UIComponents/Icons/IconCheckBoxUnchecked";
-import FormInput, { getInputType } from "../UIComponents/FormInputs/FormInput";
+import FormInput from "../UIComponents/FormInputs/FormInput";
 import { Toast } from "../UIComponents/Toast/Toast";
 
 // mock data
@@ -202,7 +203,9 @@ class RoomsPage extends React.Component{
     }
 
     handleBackButtonClick(){
-        window.open('/','_self');
+        if (this.props.navigate) {
+            this.props.navigate('/branches');
+        }
     }
 
     onFilerSelect(index) {
@@ -376,4 +379,10 @@ class RoomsPage extends React.Component{
     }
 }
 
-export default RoomsPage;
+// Functional wrapper injects useNavigate into the class component.
+function RoomsPageWithRouter() {
+    const navigate = useNavigate();
+    return <RoomsPage navigate={navigate} />;
+}
+
+export default RoomsPageWithRouter;

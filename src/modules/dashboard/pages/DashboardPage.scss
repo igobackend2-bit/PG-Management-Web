@@ -1,0 +1,88 @@
+@use '@/styles/tokens' as *;
+@use '@/styles/mixins' as *;
+
+.dashboard-page {
+  .page-header {
+    @include flex-between;
+    margin-bottom: $space-6;
+
+    h2 { font-size: $font-size-xl; }
+
+    .branch-tag {
+      background-color: $color-primary-light;
+      color: $color-primary;
+      padding: $space-1 $space-3;
+      border-radius: $border-radius-full;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: $space-4;
+    margin-bottom: $space-8;
+  }
+
+  .kpi-card {
+    @include card;
+    padding: $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+
+    .kpi-value {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $color-text-primary;
+    }
+
+    .kpi-label {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.kpi-blue  { border-top: 3px solid $color-primary; }
+    &.kpi-green { border-top: 3px solid $color-green; }
+    &.kpi-red   { border-top: 3px solid $color-red; }
+    &.kpi-yellow{ border-top: 3px solid $color-yellow; }
+  }
+
+  .coming-soon-modules {
+    h3 {
+      font-size: $font-size-md;
+      margin-bottom: $space-4;
+      color: $color-text-secondary;
+    }
+  }
+
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: $space-3;
+  }
+
+  .module-card {
+    @include card;
+    padding: $space-4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: $space-2;
+    transition: box-shadow $transition-fast, transform $transition-fast;
+    cursor: default;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+
+    .module-icon { font-size: 1.75rem; }
+    .module-name { font-size: $font-size-sm; font-weight: $font-weight-semibold; }
+    .module-desc { font-size: $font-size-xs; color: $color-text-muted; }
+  }
+}

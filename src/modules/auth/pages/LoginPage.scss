@@ -1,0 +1,75 @@
+@use '@/styles/tokens' as *;
+@use '@/styles/mixins' as *;
+
+.login-page {
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin-bottom: $space-1;
+  }
+
+  .login-subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-6;
+  }
+
+  .login-error {
+    background-color: $color-red-light;
+    color: $color-red;
+    border-radius: $border-radius-md;
+    padding: $space-3 $space-4;
+    font-size: $font-size-sm;
+    margin-bottom: $space-4;
+    border: 1px solid lighten($color-red, 30%);
+  }
+
+  .form-group {
+    margin-bottom: $space-4;
+
+    label {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-secondary;
+      margin-bottom: $space-1;
+    }
+
+    input {
+      width: 100%;
+      padding: $space-3 $space-3;
+      border: 1.5px solid $color-border;
+      border-radius: $border-radius-md;
+      font-size: $font-size-base;
+      font-family: $font-primary;
+      transition: border-color $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px $color-primary-light;
+      }
+
+      &:disabled { background-color: $color-grey-light; cursor: not-allowed; }
+    }
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: $space-3;
+    background-color: $color-primary;
+    color: $color-white;
+    border: none;
+    border-radius: $border-radius-md;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    font-family: $font-primary;
+    cursor: pointer;
+    margin-top: $space-2;
+    transition: background-color $transition-fast;
+
+    &:hover:not(:disabled) { background-color: $color-primary-hover; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}

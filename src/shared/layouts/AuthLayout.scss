@@ -1,0 +1,36 @@
+@use '@/styles/tokens' as *;
+@use '@/styles/mixins' as *;
+
+.auth-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $color-purple 0%, $color-primary 100%);
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-8;
+  padding: $space-8 $space-4;
+
+  .auth-brand {
+    text-align: center;
+    color: $color-white;
+
+    svg { margin: 0 auto $space-3; display: block; }
+
+    h1 {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      margin-bottom: $space-2;
+    }
+
+    p {
+      font-size: $font-size-sm;
+      opacity: 0.85;
+    }
+  }
+
+  .auth-card {
+    @include card;
+    width: 100%;
+    max-width: 420px;
+    padding: $space-8;
+  }
+}

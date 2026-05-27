@@ -1,0 +1,101 @@
+// ─── Brand Colors ────────────────────────────────────────────────────────────
+$color-primary:       #3171e0;
+$color-primary-hover: #4d81db;
+$color-primary-light: #e8f0fd;
+$color-purple:        #7a55e8;
+$color-purple-hover:  #6644d6;
+$color-blue-light:    #5dbae1;
+$color-red:           rgb(241, 76, 58);
+$color-red-light:     #fdecea;
+$color-green:         #2e9e4f;
+$color-green-light:   #e6f5eb;
+$color-green-accent:  #85dd4a;
+$color-yellow:        #f0a500;
+$color-yellow-light:  #fff8e6;
+$color-grey:          #b4b0b0;
+$color-grey-light:    #f5f5f5;
+$color-grey-mid:      #e0e0e0;
+$color-grey-dark:     #6b6b6b;
+
+// ─── Neutrals ─────────────────────────────────────────────────────────────────
+$color-white:         #ffffff;
+$color-bg:            rgb(241, 241, 240);
+$color-surface:       #ffffff;
+$color-border:        #e2e2e2;
+$color-text-primary:  #1a1a2e;
+$color-text-secondary:#555770;
+$color-text-muted:    #9e9e9e;
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+$font-primary:  'Open Sans', sans-serif;
+$font-mono:     'Courier New', monospace;
+
+$font-size-xs:   0.75rem;   // 12px
+$font-size-sm:   0.875rem;  // 14px
+$font-size-base: 1rem;      // 16px
+$font-size-md:   1.125rem;  // 18px
+$font-size-lg:   1.25rem;   // 20px
+$font-size-xl:   1.5rem;    // 24px
+$font-size-2xl:  2rem;      // 32px
+
+$font-weight-regular: 400;
+$font-weight-medium:  500;
+$font-weight-semibold:600;
+$font-weight-bold:    700;
+
+$line-height-tight:  1.25;
+$line-height-normal: 1.5;
+$line-height-loose:  1.75;
+
+// ─── Spacing ─────────────────────────────────────────────────────────────────
+$space-1:  0.25rem;  // 4px
+$space-2:  0.5rem;   // 8px
+$space-3:  0.75rem;  // 12px
+$space-4:  1rem;     // 16px
+$space-5:  1.25rem;  // 20px
+$space-6:  1.5rem;   // 24px
+$space-8:  2rem;     // 32px
+$space-10: 2.5rem;   // 40px
+$space-12: 3rem;     // 48px
+$space-16: 4rem;     // 64px
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+$header-height:  4rem;
+$sidebar-width:  240px;
+$sidebar-collapsed-width: 64px;
+$right-panel-width: 320px;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-full: 9999px;
+
+// ─── Shadows ─────────────────────────────────────────────────────────────────
+$shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+$shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+$shadow-lg:  0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+$shadow-xl:  0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
+
+// ─── Z-Index Scale ────────────────────────────────────────────────────────────
+$z-base:      1;
+$z-sticky:    10;
+$z-dropdown:  100;
+$z-sidebar:   200;
+$z-modal:     300;
+$z-toast:     400;
+$z-tooltip:   500;
+
+// ─── Transitions ─────────────────────────────────────────────────────────────
+$transition-fast:   0.15s ease;
+$transition-normal: 0.25s ease;
+$transition-slow:   0.4s ease;
+
+// ─── Backward-compat aliases (used by existing components) ───────────────────
+$primary-color:        $color-primary;
+$primary-hover-color:  $color-primary-hover;
+$header-background:    $color-purple;
+$blue:                 $color-blue-light;
+$red:                  $color-red;
+$grey:                 $color-grey;
+$green:                $color-green-accent;
+$primary-font:         $font-primary;

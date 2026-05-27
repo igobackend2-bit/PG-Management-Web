@@ -1,0 +1,161 @@
+@use './tokens' as *;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: $font-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background-color: $color-bg;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: $font-primary;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+}
+
+p { margin: 0; }
+a { color: $color-primary; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button {
+  cursor: pointer;
+  font-family: $font-primary;
+}
+
+input, textarea, select {
+  font-family: $font-primary;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+// ─── Global button styles ─────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border: none;
+  transition: background-color $transition-fast, box-shadow $transition-fast;
+  white-space: nowrap;
+
+  &.btn-primary {
+    background-color: $color-primary;
+    color: $color-white;
+    &:hover { background-color: $color-primary-hover; }
+  }
+
+  &.btn-secondary {
+    background-color: transparent;
+    color: $color-primary;
+    border: 1.5px solid $color-primary;
+    &:hover { background-color: $color-primary-light; }
+  }
+
+  &.btn-danger {
+    background-color: $color-red;
+    color: $color-white;
+    &:hover { opacity: 0.9; }
+  }
+
+  &.btn-ghost {
+    background-color: transparent;
+    color: $color-text-secondary;
+    &:hover { background-color: $color-grey-light; }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Global chip/badge styles ─────────────────────────────────────────────────
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  &.success {
+    background-color: $color-green-light;
+    color: $color-green;
+  }
+
+  &.danger {
+    background-color: $color-red-light;
+    color: $color-red;
+  }
+
+  &.warning {
+    background-color: $color-yellow-light;
+    color: $color-yellow;
+  }
+
+  &.info {
+    background-color: $color-primary-light;
+    color: $color-primary;
+  }
+}
+
+// ─── Legacy CRA overrides (kept for existing component compat) ────────────────
+.create-button, button.primary {
+  background-color: $color-primary;
+  color: white;
+  border: none;
+  border-radius: $border-radius-sm;
+  padding: $space-2 $space-4;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-family: $font-primary;
+  font-weight: $font-weight-medium;
+  &:hover { background-color: $color-primary-hover; }
+}
+
+button.secondary {
+  background-color: transparent;
+  color: $color-text-secondary;
+  border: 1.5px solid $color-border;
+  border-radius: $border-radius-sm;
+  padding: $space-2 $space-4;
+  cursor: pointer;
+  font-family: $font-primary;
+  &:hover { background-color: $color-grey-light; }
+}
+
+.textbox {
+  border: 1.5px solid $color-border;
+  border-radius: $border-radius-sm;
+  padding: $space-2 $space-3;
+  font-size: $font-size-sm;
+  font-family: $font-primary;
+  width: 100%;
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+  }
+}

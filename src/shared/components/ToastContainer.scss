@@ -1,0 +1,52 @@
+@use '@/styles/tokens' as *;
+
+.toast-container {
+  position: fixed;
+  bottom: $space-6;
+  right: $space-6;
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  max-width: 360px;
+}
+
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  font-size: $font-size-sm;
+  font-family: $font-primary;
+  animation: toast-slide-in 0.25s ease;
+
+  .toast-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    font-weight: $font-weight-bold;
+  }
+
+  .toast-message { flex: 1; }
+
+  .toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: $font-size-xs;
+    opacity: 0.6;
+    padding: 2px;
+    &:hover { opacity: 1; }
+  }
+
+  &.success { background-color: $color-green; color: white; }
+  &.error   { background-color: $color-red;   color: white; }
+  &.warning { background-color: $color-yellow; color: $color-text-primary; }
+  &.info    { background-color: $color-primary; color: white; }
+}
+
+@keyframes toast-slide-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}

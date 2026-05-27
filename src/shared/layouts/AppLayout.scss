@@ -1,0 +1,269 @@
+@use '@/styles/tokens' as *;
+@use '@/styles/mixins' as *;
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: $color-bg;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+.app-header {
+  height: $header-height;
+  background-color: $color-purple;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  padding: 0 $space-4;
+  flex-shrink: 0;
+  z-index: $z-sticky;
+  box-shadow: $shadow-md;
+  gap: $space-4;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    min-width: 200px;
+
+    .sidebar-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: $space-2;
+      border-radius: $border-radius-sm;
+
+      span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background-color: $color-white;
+        transition: $transition-fast;
+      }
+
+      &:hover { background-color: rgba(255,255,255,0.1); }
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      color: $color-white;
+    }
+
+    .app-title {
+      font-family: $font-primary;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .header-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .branch-selector select {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: $color-white;
+      border-radius: $border-radius-md;
+      padding: $space-2 $space-3;
+      font-family: $font-primary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      min-width: 200px;
+
+      option { background-color: $color-purple; }
+
+      &:focus { outline: none; border-color: rgba(255,255,255,0.6); }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    min-width: 200px;
+    justify-content: flex-end;
+
+    .profile-menu {
+      position: relative;
+      cursor: pointer;
+
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: $border-radius-full;
+        background-color: rgba(255,255,255,0.25);
+        color: $color-white;
+        @include flex-center;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
+        border: 2px solid rgba(255,255,255,0.4);
+        transition: $transition-fast;
+
+        &:hover { background-color: rgba(255,255,255,0.35); }
+      }
+
+      .profile-dropdown {
+        position: absolute;
+        right: 0;
+        top: calc(100% + $space-2);
+        background: $color-surface;
+        border-radius: $border-radius-lg;
+        box-shadow: $shadow-xl;
+        min-width: 200px;
+        z-index: $z-dropdown;
+        overflow: hidden;
+        border: 1px solid $color-border;
+
+        .profile-info {
+          padding: $space-4;
+          display: flex;
+          flex-direction: column;
+          gap: $space-1;
+
+          strong { color: $color-text-primary; font-size: $font-size-sm; }
+          span { color: $color-text-muted; font-size: $font-size-xs; }
+
+          .role-badge {
+            display: inline-flex;
+            align-self: flex-start;
+            background-color: $color-primary-light;
+            color: $color-primary;
+            padding: 2px $space-2;
+            border-radius: $border-radius-full;
+            font-size: $font-size-xs;
+            font-weight: $font-weight-medium;
+            text-transform: capitalize;
+          }
+        }
+
+        hr { margin: 0; border: none; border-top: 1px solid $color-border; }
+
+        button {
+          display: block;
+          width: 100%;
+          text-align: left;
+          padding: $space-3 $space-4;
+          background: none;
+          border: none;
+          font-size: $font-size-sm;
+          color: $color-text-primary;
+          cursor: pointer;
+
+          &:hover { background-color: $color-grey-light; }
+          &.sign-out { color: $color-red; }
+        }
+      }
+    }
+  }
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+.app-sidebar {
+  width: $sidebar-width;
+  flex-shrink: 0;
+  background-color: $color-surface;
+  border-right: 1px solid $color-border;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width $transition-normal;
+  z-index: $z-sidebar;
+  @include scrollbar-thin;
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: $space-3 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-3 $space-4;
+    color: $color-text-secondary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    border-radius: 0;
+    transition: background-color $transition-fast, color $transition-fast;
+    white-space: nowrap;
+    overflow: hidden;
+
+    .nav-icon {
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      transition: opacity $transition-normal;
+    }
+
+    &:hover {
+      background-color: $color-primary-light;
+      color: $color-primary;
+      text-decoration: none;
+    }
+
+    &.active {
+      background-color: $color-primary-light;
+      color: $color-primary;
+      font-weight: $font-weight-semibold;
+      border-left: 3px solid $color-primary;
+    }
+  }
+}
+
+// ─── Main Content ────────────────────────────────────────────────────────────
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-6;
+  @include scrollbar-thin;
+}
+
+// ─── Collapsed Sidebar ────────────────────────────────────────────────────────
+.app-layout.sidebar-collapsed {
+  .app-sidebar {
+    width: $sidebar-collapsed-width;
+
+    .nav-label { opacity: 0; pointer-events: none; }
+    .nav-item { justify-content: center; padding: $space-3; }
+  }
+
+  .header-left {
+    .app-title { display: none; }
+  }
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .app-layout:not(.sidebar-collapsed) .app-sidebar {
+    position: fixed;
+    top: $header-height;
+    left: 0;
+    bottom: 0;
+    z-index: $z-modal;
+    box-shadow: $shadow-xl;
+  }
+}
