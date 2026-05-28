@@ -1,0 +1,337 @@
+@use '@/styles/tokens' as *;
+@use '@/styles/mixins' as *;
+
+.accounts-page {
+  // ─── Header ───────────────────────────────────────────────────────────────
+  .page-header {
+    @include flex-between;
+    margin-bottom: $space-6;
+
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: $space-3;
+
+      h2 { font-size: $font-size-xl; margin: 0; color: $color-text-primary; }
+
+      .branch-tag {
+        background-color: $color-primary-light;
+        color: $color-primary;
+        padding: $space-1 $space-3;
+        border-radius: $border-radius-full;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+      }
+    }
+
+    .btn-action {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+      background-color: $color-primary;
+      color: $color-white;
+      border: none;
+      padding: $space-2 $space-5;
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: background-color $transition-fast;
+
+      &:hover { background-color: $color-primary-hover; }
+    }
+  }
+
+  // ─── Tabs ─────────────────────────────────────────────────────────────────
+  .tab-bar {
+    display: flex;
+    border-bottom: 2px solid $color-border;
+    margin-bottom: $space-5;
+    gap: 0;
+
+    .tab-btn {
+      padding: $space-3 $space-5;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-muted;
+      cursor: pointer;
+      transition: color $transition-fast, border-color $transition-fast;
+
+      &:hover { color: $color-primary; }
+
+      &.active {
+        color: $color-primary;
+        border-bottom-color: $color-primary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+
+  // ─── Summary Chips ─────────────────────────────────────────────────────────
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-4;
+    margin-bottom: $space-5;
+
+    @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .summary-card {
+    @include card;
+    padding: $space-4 $space-5;
+
+    .s-label { font-size: $font-size-xs; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: $space-1; }
+    .s-value { font-size: $font-size-xl; font-weight: $font-weight-bold; color: $color-text-primary; }
+
+    &.green  { border-top: 3px solid $color-green; }
+    &.red    { border-top: 3px solid $color-red; }
+    &.yellow { border-top: 3px solid $color-yellow; }
+    &.blue   { border-top: 3px solid $color-primary; }
+  }
+
+  // ─── Month Selector ────────────────────────────────────────────────────────
+  .month-bar {
+    @include flex-between;
+    margin-bottom: $space-4;
+    flex-wrap: wrap;
+    gap: $space-3;
+
+    label {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    input[type='month'], select {
+      padding: $space-2 $space-3;
+      border: 1px solid $color-border;
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      font-family: $font-primary;
+      outline: none;
+      &:focus { border-color: $color-primary; }
+    }
+  }
+
+  // ─── Table ─────────────────────────────────────────────────────────────────
+  .table-wrap {
+    @include card;
+    overflow: hidden;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: $font-size-sm;
+
+      thead tr {
+        background-color: $color-grey-light;
+
+        th {
+          padding: $space-3 $space-4;
+          text-align: left;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-semibold;
+          color: $color-text-muted;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          white-space: nowrap;
+        }
+      }
+
+      tbody tr {
+        border-top: 1px solid $color-border;
+        transition: background-color $transition-fast;
+
+        &:hover { background-color: $color-grey-light; }
+
+        td {
+          padding: $space-3 $space-4;
+          color: $color-text-primary;
+          vertical-align: middle;
+
+          &.muted { color: $color-text-muted; }
+          &.amount-in  { color: $color-green; font-weight: $font-weight-semibold; }
+          &.amount-out { color: $color-red;   font-weight: $font-weight-semibold; }
+        }
+      }
+    }
+  }
+
+  // ─── Status Badge ──────────────────────────────────────────────────────────
+  .status-badge {
+    display: inline-flex;
+    padding: 2px 10px;
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+
+    &.paid     { background-color: $color-green-light; color: $color-green; }
+    &.partial  { background-color: $color-yellow-light; color: $color-yellow; }
+    &.unpaid   { background-color: $color-red-light; color: $color-red; }
+  }
+
+  // ─── Action Buttons ────────────────────────────────────────────────────────
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $space-1 $space-2;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    transition: background-color $transition-fast;
+
+    &.pay    { color: $color-green;  &:hover { background-color: $color-green-light; } }
+    &.edit   { color: $color-primary; &:hover { background-color: $color-primary-light; } }
+    &.delete { color: $color-red;    &:hover { background-color: $color-red-light; } }
+  }
+
+  .actions-cell { display: flex; gap: $space-1; }
+
+  // ─── P&L Cards ─────────────────────────────────────────────────────────────
+  .pl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-4;
+    margin-bottom: $space-6;
+
+    @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .pl-card {
+    @include card;
+    padding: $space-5;
+    text-align: center;
+
+    .pl-icon   { font-size: 1.75rem; margin-bottom: $space-2; }
+    .pl-label  { font-size: $font-size-xs; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: $space-1; }
+    .pl-value  { font-size: $font-size-xl; font-weight: $font-weight-bold; color: $color-text-primary; }
+    .pl-sub    { font-size: $font-size-xs; color: $color-text-muted; margin-top: $space-1; }
+
+    &.profit .pl-value  { color: $color-green; }
+    &.loss   .pl-value  { color: $color-red; }
+  }
+
+  // ─── Empty + Loading ───────────────────────────────────────────────────────
+  .empty-state {
+    @include flex-center;
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-12;
+    color: $color-text-muted;
+
+    .empty-icon  { font-size: 3rem; }
+    .empty-title { font-size: $font-size-md; font-weight: $font-weight-semibold; }
+    p { font-size: $font-size-sm; text-align: center; }
+  }
+
+  .loading-wrap { @include flex-center; padding: $space-12; }
+}
+
+// ─── Mini Modal ───────────────────────────────────────────────────────────────
+.mini-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: $z-modal;
+  @include flex-center;
+  padding: $space-4;
+}
+
+.mini-modal {
+  background: $color-surface;
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: $shadow-xl;
+
+  .mini-modal-header {
+    @include flex-between;
+    padding: $space-4 $space-5;
+    border-bottom: 1px solid $color-border;
+
+    h4 { margin: 0; font-size: $font-size-base; font-weight: $font-weight-semibold; }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: $font-size-md;
+      color: $color-text-muted;
+      padding: $space-1;
+      border-radius: $border-radius-sm;
+      &:hover { background: $color-grey-light; }
+    }
+  }
+
+  .mini-modal-body {
+    padding: $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: $space-1;
+
+      label {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        color: $color-text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      input, select, textarea {
+        padding: $space-2 $space-3;
+        border: 1px solid $color-border;
+        border-radius: $border-radius-md;
+        font-size: $font-size-sm;
+        font-family: $font-primary;
+        outline: none;
+        transition: border-color $transition-fast;
+        &:focus { border-color: $color-primary; }
+      }
+
+      textarea { resize: vertical; min-height: 64px; }
+    }
+  }
+
+  .mini-modal-footer {
+    @include flex-between;
+    padding: $space-4 $space-5;
+    border-top: 1px solid $color-border;
+    gap: $space-3;
+
+    .error-msg { font-size: $font-size-xs; color: $color-red; flex: 1; }
+
+    .btn-cancel {
+      padding: $space-2 $space-4;
+      background: none;
+      border: 1px solid $color-border;
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      cursor: pointer;
+      &:hover { background: $color-grey-light; }
+    }
+
+    .btn-save {
+      padding: $space-2 $space-5;
+      background-color: $color-primary;
+      color: $color-white;
+      border: none;
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      &:hover { background-color: $color-primary-hover; }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+  }
+}

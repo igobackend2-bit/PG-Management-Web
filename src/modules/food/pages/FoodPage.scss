@@ -1,0 +1,86 @@
+@use '@/styles/module' as *;
+
+.food-page {
+  @include base;
+
+  // ── Bill upload helpers ───────────────────────────────────────────────────
+  .field-hint {
+    display: block;
+    margin-top: $space-1;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-style: italic;
+  }
+  .bill-preview {
+    display: inline-block;
+    margin-top: $space-1;
+    font-size: $font-size-xs;
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+
+  // ── Meal Grid ────────────────────────────────────────────────────────────
+  .meal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-4;
+    @include respond-to('md') { grid-template-columns: 1fr; }
+
+    .meal-card {
+      @include card;
+      padding: $space-5;
+      display: flex;
+      flex-direction: column;
+      gap: $space-3;
+
+      .meal-icon  { font-size: 2rem; }
+      .meal-title { font-size: $font-size-md; font-weight: $font-weight-semibold; color: $color-text-primary; }
+
+      .meal-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-3;
+
+        .meal-field {
+          display: flex;
+          flex-direction: column;
+          gap: $space-1;
+
+          label {
+            font-size: $font-size-xs;
+            font-weight: $font-weight-medium;
+            color: $color-text-secondary;
+          }
+
+          input {
+            padding: $space-2 $space-3;
+            border: 1px solid $color-border;
+            border-radius: $border-radius-md;
+            font-size: $font-size-sm;
+            font-family: $font-primary;
+            background: $color-surface;
+            outline: none;
+            &:focus { border-color: $color-primary; }
+          }
+        }
+      }
+    }
+
+    // ── Save Row spans full grid width ───────────────────────────────────
+    .meal-save-row {
+      grid-column: 1 / -1;
+      @include flex-between;
+      padding: $space-4 $space-5;
+      background: $color-grey-light;
+      border-radius: $border-radius-md;
+      flex-wrap: wrap;
+      gap: $space-3;
+
+      .meal-total {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        strong { color: $color-text-primary; }
+      }
+    }
+  }
+}

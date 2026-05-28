@@ -122,6 +122,19 @@ img {
   }
 }
 
+// ─── Loader spinner ───────────────────────────────────────────────────────────
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid $color-grey-mid;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
 // ─── Legacy CRA overrides (kept for existing component compat) ────────────────
 .create-button, button.primary {
   background-color: $color-primary;

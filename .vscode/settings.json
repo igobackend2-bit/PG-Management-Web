@@ -1,0 +1,5 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTs": false,
+  "typescript.preferences.importModuleSpecifier": "relative"
+}

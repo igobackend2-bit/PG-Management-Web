@@ -1,0 +1,16 @@
+@use '@/styles/module' as *;
+
+.staff-page {
+  @include base;
+
+  .att-summary {
+    display: flex;
+    gap: $space-2;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .table-wrap td select {
+    min-width: 160px;
+  }
+}

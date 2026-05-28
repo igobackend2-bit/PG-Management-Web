@@ -1,0 +1,92 @@
+@use '@/styles/module' as *;
+
+.documents-page {
+  @include base;
+
+  // ── Document groups ────────────────────────────────────────────────────────
+  .doc-groups {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  .doc-group {
+    @include card;
+    overflow: hidden;
+
+    .doc-group-header {
+      @include flex-between;
+      padding: $space-3 $space-4;
+      background: $color-grey-light;
+      border-bottom: 1px solid $color-border;
+
+      .tenant-name {
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
+        color: $color-text-primary;
+      }
+
+      .doc-count {
+        font-size: $font-size-xs;
+        color: $color-text-muted;
+        background: $color-surface;
+        padding: 2px $space-2;
+        border-radius: $border-radius-full;
+      }
+    }
+
+    .no-docs {
+      padding: $space-4;
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      font-style: italic;
+    }
+
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $space-3;
+      padding: $space-3 $space-4;
+      border-top: 1px solid $color-border;
+      transition: background-color $transition-fast;
+
+      &:hover { background: $color-grey-light; }
+
+      &.is-expired  { background: $color-red-light; }
+      &.is-expiring { background: $color-yellow-light; }
+
+      .doc-info {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: $space-3;
+
+        .doc-type {
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          color: $color-text-primary;
+        }
+
+        .doc-expiry {
+          font-size: $font-size-xs;
+          &.text-red    { color: $color-red; }
+          &.text-yellow { color: $color-yellow; }
+          &.text-muted  { color: $color-text-muted; }
+        }
+
+        .doc-link {
+          font-size: $font-size-xs;
+          color: $color-primary;
+          font-weight: $font-weight-medium;
+          &:hover { text-decoration: underline; }
+        }
+      }
+    }
+  }
+}

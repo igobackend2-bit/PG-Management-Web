@@ -5,24 +5,54 @@
   .page-header {
     @include flex-between;
     margin-bottom: $space-6;
+    flex-wrap: wrap;
+    gap: $space-3;
 
-    h2 { font-size: $font-size-xl; }
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: $space-3;
+      h2 { font-size: $font-size-xl; margin: 0; }
+    }
 
     .branch-tag {
       background-color: $color-primary-light;
       color: $color-primary;
       padding: $space-1 $space-3;
       border-radius: $border-radius-full;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+    }
+
+    .month-label {
       font-size: $font-size-sm;
+      color: $color-text-muted;
       font-weight: $font-weight-medium;
     }
   }
 
+  // ── No-branch message ──────────────────────────────────────────────────────
+  .no-branch-msg {
+    @include flex-center;
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-16;
+    color: $color-text-muted;
+    .nb-icon { font-size: 3rem; }
+    p { font-size: $font-size-sm; text-align: center; }
+  }
+
+  // ── Loading ────────────────────────────────────────────────────────────────
+  .loading-wrap { @include flex-center; padding: $space-12; }
+
+  // ── KPI Grid ───────────────────────────────────────────────────────────────
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: $space-4;
     margin-bottom: $space-8;
+    @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
+    @include respond-to('sm') { grid-template-columns: 1fr 1fr; }
   }
 
   .kpi-card {
@@ -37,31 +67,36 @@
       font-weight: $font-weight-bold;
       color: $color-text-primary;
     }
-
     .kpi-label {
       font-size: $font-size-xs;
       color: $color-text-muted;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
-    &.kpi-blue  { border-top: 3px solid $color-primary; }
-    &.kpi-green { border-top: 3px solid $color-green; }
-    &.kpi-red   { border-top: 3px solid $color-red; }
-    &.kpi-yellow{ border-top: 3px solid $color-yellow; }
-  }
-
-  .coming-soon-modules {
-    h3 {
-      font-size: $font-size-md;
-      margin-bottom: $space-4;
-      color: $color-text-secondary;
+    .kpi-sub {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
     }
+
+    &.kpi-blue   { border-top: 3px solid $color-primary; }
+    &.kpi-green  { border-top: 3px solid $color-green; }
+    &.kpi-red    { border-top: 3px solid $color-red; }
+    &.kpi-yellow { border-top: 3px solid $color-yellow; }
+    &.kpi-purple { border-top: 3px solid $color-purple; }
   }
 
+  // ── Section title ──────────────────────────────────────────────────────────
+  .section-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    margin-bottom: $space-4;
+  }
+
+  // ── Module Grid ───────────────────────────────────────────────────────────
   .module-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: $space-3;
   }
 
@@ -73,8 +108,8 @@
     align-items: center;
     text-align: center;
     gap: $space-2;
+    cursor: pointer;
     transition: box-shadow $transition-fast, transform $transition-fast;
-    cursor: default;
 
     &:hover {
       box-shadow: $shadow-md;

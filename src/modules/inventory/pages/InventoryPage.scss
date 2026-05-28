@@ -1,0 +1,5 @@
+@use '@/styles/module' as *;
+
+.inventory-page {
+  @include base;
+}

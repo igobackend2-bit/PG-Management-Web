@@ -1,0 +1,254 @@
+@use '@/styles/module' as *;
+
+.branches-page {
+  @include base;
+
+  .branch-count {
+    background: $color-grey-light;
+    color: $color-text-muted;
+    padding: $space-1 $space-3;
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  // ── Branch Card Grid ───────────────────────────────────────────────────────
+  .branch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $space-4;
+  }
+
+  .branch-card {
+    @include card;
+    padding: $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    .branch-card-header {
+      @include flex-between;
+      gap: $space-2;
+
+      .branch-name {
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        color: $color-text-primary;
+      }
+
+      .branch-actions { display: flex; gap: $space-1; }
+    }
+
+    .branch-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $space-2;
+      align-items: center;
+
+      .meta-item {
+        font-size: $font-size-xs;
+        color: $color-text-muted;
+      }
+
+      .meta-badge {
+        padding: 2px $space-2;
+        border-radius: $border-radius-full;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        background: $color-grey-light;
+        color: $color-grey-dark;
+
+        &.food {
+          background: $color-green-light;
+          color: $color-green;
+        }
+      }
+    }
+
+    .branch-address {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      line-height: $line-height-normal;
+    }
+  }
+
+  // ── Branch-tag chip (shown in header when on Rooms tab) ───────────────────
+  .branch-tag {
+    background: $color-primary-light;
+    color: $color-primary;
+    padding: $space-1 $space-3;
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  // ── "Manage Rooms" button on branch card ──────────────────────────────────
+  .btn-rooms {
+    align-self: flex-start;
+    margin-top: $space-1;
+    padding: $space-2 $space-3;
+    background: $color-grey-light;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    &:hover { background: $color-primary; color: $color-white; border-color: $color-primary; }
+  }
+
+  // ── Rooms list ─────────────────────────────────────────────────────────────
+  .rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  .room-card {
+    @include card;
+    padding: $space-4 $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    // ── Room header ──────────────────────────────────────────────────────────
+    .room-header {
+      @include flex-between;
+      gap: $space-3;
+
+      .room-title {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: $space-3;
+
+        .room-number {
+          font-size: $font-size-md;
+          font-weight: $font-weight-semibold;
+          color: $color-text-primary;
+        }
+
+        .room-type-badge {
+          padding: 2px $space-2;
+          border-radius: $border-radius-full;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-medium;
+          background: $color-grey-light;
+          color: $color-grey-dark;
+        }
+
+        .room-rent {
+          font-size: $font-size-sm;
+          font-weight: $font-weight-semibold;
+          color: $color-text-primary;
+        }
+
+        .room-per-day {
+          font-size: $font-size-xs;
+          color: $color-text-muted;
+        }
+      }
+
+      .room-actions { display: flex; gap: $space-1; }
+    }
+
+    // ── Beds section ─────────────────────────────────────────────────────────
+    .beds-section {
+      display: flex;
+      flex-direction: column;
+      gap: $space-2;
+
+      .beds-label {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        color: $color-text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .beds-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $space-2;
+        align-items: center;
+      }
+    }
+
+    // ── Bed chip ─────────────────────────────────────────────────────────────
+    .bed-chip {
+      display: flex;
+      align-items: center;
+      gap: $space-1;
+      padding: $space-1 $space-2;
+      border-radius: $border-radius-md;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      border: 1px solid transparent;
+      transition: opacity 0.15s;
+
+      &.occupied {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: $color-red;
+      }
+      &.vacant {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+        color: $color-green;
+      }
+
+      .bed-label { font-weight: $font-weight-semibold; }
+      .bed-status { opacity: 0.8; }
+
+      .bed-delete {
+        margin-left: $space-1;
+        background: none;
+        border: none;
+        font-size: 14px;
+        line-height: 1;
+        color: $color-red;
+        cursor: pointer;
+        padding: 0 2px;
+        border-radius: 2px;
+        opacity: 0.6;
+        &:hover { opacity: 1; }
+      }
+    }
+
+    // ── Add Bed button ────────────────────────────────────────────────────────
+    .bed-add-btn {
+      padding: $space-1 $space-3;
+      background: none;
+      border: 1px dashed $color-border;
+      border-radius: $border-radius-md;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: $color-text-muted;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      &:hover:not(:disabled) { border-color: $color-primary; color: $color-primary; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+  }
+
+  // ── Field hint (in room modal) ─────────────────────────────────────────────
+  .field-hint {
+    display: block;
+    margin-top: $space-1;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-style: italic;
+  }
+
+  // ── Food checkbox in modal ─────────────────────────────────────────────────
+  .food-check label {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+    input[type='checkbox'] { width: 16px; height: 16px; cursor: pointer; }
+  }
+}

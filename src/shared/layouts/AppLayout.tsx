@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { to: '/food',         label: 'Food',        icon: '🍽' },
   { to: '/inventory',    label: 'Inventory',   icon: '📦' },
   { to: '/staff',        label: 'Staff',       icon: '👷' },
-  { to: '/leads',        label: 'Leads',       icon: '📣' },
   { to: '/reports',      label: 'Reports',     icon: '📊' },
   { to: '/documents',    label: 'Documents',   icon: '📄' },
 ];

@@ -1,0 +1,69 @@
+@use '@/styles/module' as *;
+
+.reports-page {
+  @include base;
+
+  .section-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    margin: $space-6 0 $space-4;
+  }
+
+  // ── Breakdown Card ─────────────────────────────────────────────────────────
+  .breakdown-card {
+    @include card;
+    padding: $space-5;
+    max-width: 640px;
+
+    h4 {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-text-secondary;
+      margin-bottom: $space-4;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    td {
+      padding: $space-2 $space-3;
+      border-bottom: 1px solid $color-border;
+      color: $color-text-primary;
+
+      &:last-child { text-align: right; }
+    }
+
+    .section-hdr td {
+      background: $color-grey-light;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: $color-text-muted;
+      padding: $space-2 $space-3;
+    }
+
+    .sub-total td {
+      border-top: 2px solid $color-border;
+      border-bottom: 2px solid $color-border;
+      background: $color-grey-light;
+    }
+
+    .pl-row td {
+      border-top: 2px solid $color-text-primary;
+      padding-top: $space-3;
+      font-size: $font-size-md;
+    }
+
+    .text-muted { color: $color-text-muted; }
+    .col-green  { color: $color-green;  font-weight: $font-weight-semibold; }
+    .col-red    { color: $color-red;    font-weight: $font-weight-semibold; }
+    .amount     { font-family: $font-mono; }
+  }
+}

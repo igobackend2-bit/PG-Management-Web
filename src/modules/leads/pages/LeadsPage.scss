@@ -1,0 +1,23 @@
+@use '@/styles/module' as *;
+
+.leads-page {
+  @include base;
+
+  // Inline status select in table
+  .status-select {
+    padding: $space-1 $space-2;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-xs;
+    font-family: $font-primary;
+    background: $color-surface;
+    cursor: pointer;
+    outline: none;
+
+    &.s-new            { color: $color-text-secondary; }
+    &.s-contacted       { color: $color-primary;       background: $color-primary-light; }
+    &.s-visit_scheduled { color: $color-yellow;        background: $color-yellow-light; }
+    &.s-converted       { color: $color-green;         background: $color-green-light; }
+    &.s-lost            { color: $color-red;           background: $color-red-light; }
+  }
+}
