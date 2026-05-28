@@ -45,9 +45,10 @@ export function AccountsPage() {
   const [rentRecords, setRentRecords] = useState<RentRecord[]>([]);
   const [loadingRent, setLoadingRent] = useState(false);
   const [payModal, setPayModal] = useState<TenantForRent | null>(null);
-  const [payForm, setPayForm] = useState({ amount: '', method: 'cash' });
+  const [payForm, setPayForm] = useState({ amount: '', method: 'cash', paidAt: '' });
   const [payError, setPayError] = useState('');
   const [payingId, setPayingId] = useState('');
+  const [generatingRent, setGeneratingRent] = useState(false);
 
   // Expenses state
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -104,9 +105,8 @@ export function AccountsPage() {
   useEffect(() => { if (tab === 'rent')      loadRent();     }, [tab, loadRent]);
   useEffect(() => { if (tab === 'expenses')  loadExpenses(); }, [tab, loadExpenses]);
   useEffect(() => { if (tab === 'cashbook' || tab === 'pl') loadCashbook(); }, [tab, loadCashbook]);
-
-  // Re-fetch rent when month changes (only while on rent tab)
-  useEffect(() => { if (tab === 'rent') loadRent(); }, [month]);
+  // NOTE: No separate [month] effect needed — loadRent already has `month` in its
+  // useCallback deps, so the [tab, loadRent] effect above re-fires whenever month changes.
 
   // ─── Rent helpers ──────────────────────────────────────────────────────────
   function rentForTenant(tenantId: string) {
@@ -119,20 +119,27 @@ export function AccountsPage() {
     return 'partial';
   }
 
+  /** Convert datetime-local string (YYYY-MM-DDTHH:mm) → UTC ISO string */
+  function localDatetimeToISO(local: string): string {
+    if (!local) return new Date().toISOString();
+    // datetime-local has no timezone — treat as local time
+    return new Date(local).toISOString();
+  }
+
   async function handleMarkPaid() {
     if (!payModal) return;
     const paidAmt = Number(payForm.amount);
     if (!paidAmt) { setPayError('Enter a valid amount.'); return; }
 
-    const selectedRoom = payModal.rooms;
-    const roomRent = 0; // We don't have rent amount here, caller must provide
-    const existing = rentForTenant(payModal.id);
-    const rentAmount = existing?.amount ?? paidAmt;
+    const existing   = rentForTenant(payModal.id);
+    const roomRent   = payModal.rooms?.rent ?? 0;
+    const rentAmount = existing?.amount ?? (roomRent || paidAmt);
+    const paidAt     = localDatetimeToISO(payForm.paidAt);
 
     setPayingId(payModal.id);
     setPayError('');
     try {
-      await upsertRentRecord(payModal.id, month, rentAmount, paidAmt, payForm.method);
+      await upsertRentRecord(payModal.id, month, rentAmount, paidAmt, payForm.method, paidAt);
       toast.success('Rent recorded successfully!');
       setPayModal(null);
       loadRent();
@@ -141,6 +148,27 @@ export function AccountsPage() {
     } finally {
       setPayingId('');
     }
+  }
+
+  /** Auto-generate rent records for all tenants who don't have one for the month */
+  async function handleGenerateRent() {
+    if (!tenants.length) return;
+    const missing = tenants.filter((t) => {
+      const rec = rentForTenant(t.id);
+      return !rec && (t.rooms?.rent ?? 0) > 0;
+    });
+    if (missing.length === 0) { toast.info('All tenants already have rent records for this month.'); return; }
+    setGeneratingRent(true);
+    try {
+      await Promise.all(
+        missing.map((t) =>
+          upsertRentRecord(t.id, month, t.rooms!.rent, 0, 'cash')
+        )
+      );
+      toast.success(`Generated rent records for ${missing.length} tenant(s).`);
+      loadRent();
+    } catch { toast.error('Failed to generate rent records.'); }
+    finally { setGeneratingRent(false); }
   }
 
   // ─── Expense helpers ───────────────────────────────────────────────────────
@@ -245,6 +273,11 @@ export function AccountsPage() {
           <h2>Accounts</h2>
           <span className="branch-tag">{selectedBranch.name}</span>
         </div>
+        {tab === 'rent' && tenants.length > 0 && (
+          <button className="btn-action" onClick={handleGenerateRent} disabled={generatingRent}>
+            {generatingRent ? 'Generating…' : '⚡ Generate Rent'}
+          </button>
+        )}
         {tab === 'expenses' && (
           <button className="btn-action" onClick={() => setExpModal(true)}>+ Add Expense</button>
         )}
@@ -325,19 +358,30 @@ export function AccountsPage() {
                 </thead>
                 <tbody>
                   {tenants.map((t) => {
-                    const record = rentForTenant(t.id);
-                    const status = rentStatus(record, 0);
+                    const record   = rentForTenant(t.id);
+                    const roomRent = t.rooms?.rent ?? 0;
+                    const dueAmt   = record?.amount ?? roomRent;
+                    const status   = rentStatus(record, roomRent);
                     return (
                       <tr key={t.id}>
                         <td style={{ fontWeight: 600 }}>{t.name}</td>
                         <td className="muted">{t.rooms?.number ? `Room ${t.rooms.number}` : '—'}</td>
-                        <td>{record ? CURRENCY(record.amount) : '—'}</td>
-                        <td>{record?.paid_amount ? CURRENCY(record.paid_amount) : '—'}</td>
+                        <td style={{ fontWeight: 600 }}>{dueAmt ? CURRENCY(dueAmt) : '—'}</td>
+                        <td style={{ color: record?.paid_amount ? '#2e9e4f' : undefined }}>
+                          {record?.paid_amount ? CURRENCY(record.paid_amount) : '—'}
+                        </td>
                         <td className="muted" style={{ textTransform: 'capitalize' }}>
                           {record?.payment_method ?? '—'}
                         </td>
                         <td className="muted">
-                          {record?.paid_at ? new Date(record.paid_at).toLocaleDateString('en-IN') : '—'}
+                          {record?.paid_at ? (
+                            <span>
+                              {new Date(record.paid_at).toLocaleDateString('en-IN')}
+                              <span className="paid-time">
+                                {' '}{new Date(record.paid_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </span>
+                          ) : '—'}
                         </td>
                         <td>
                           <span className={`status-badge ${status}`}>
@@ -348,12 +392,23 @@ export function AccountsPage() {
                           <button
                             className="action-btn pay"
                             onClick={() => {
+                              // Pre-fill paidAt: use existing paid_at if already paid, else now
+                              const existingPaidAt = record?.paid_at
+                                ? new Date(record.paid_at)
+                                : new Date();
+                              const localStr = new Date(
+                                existingPaidAt.getTime() - existingPaidAt.getTimezoneOffset() * 60000
+                              ).toISOString().slice(0, 16);
                               setPayModal(t);
-                              setPayForm({ amount: String(record?.amount ?? ''), method: 'cash' });
+                              setPayForm({
+                                amount: String(record?.paid_amount || dueAmt || ''),
+                                method: record?.payment_method ?? 'cash',
+                                paidAt: localStr,
+                              });
                               setPayError('');
                             }}
                           >
-                            {status === 'paid' ? 'Edit' : '✓ Pay'}
+                            {status === 'paid' ? 'Edit' : '✓ Collect'}
                           </button>
                         </td>
                       </tr>
@@ -584,12 +639,18 @@ export function AccountsPage() {
         <div className="mini-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setPayModal(null); }}>
           <div className="mini-modal">
             <div className="mini-modal-header">
-              <h4>Record Rent — {payModal.name}</h4>
+              <h4>Collect Rent — {payModal.name}</h4>
               <button onClick={() => setPayModal(null)}>✕</button>
             </div>
             <div className="mini-modal-body">
+              {payModal.rooms?.rent ? (
+                <p style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>
+                  Monthly rent: <strong>{CURRENCY(payModal.rooms.rent)}</strong>
+                  {rentForTenant(payModal.id)?.paid_amount ? ` · Already paid: ${CURRENCY(rentForTenant(payModal.id)!.paid_amount!)}` : ''}
+                </p>
+              ) : null}
               <div className="form-group">
-                <label>Amount (₹) *</label>
+                <label>Amount Collected (₹) *</label>
                 <input
                   type="number"
                   value={payForm.amount}
@@ -610,6 +671,16 @@ export function AccountsPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="form-group">
+                <label>Payment Date &amp; Time</label>
+                <input
+                  type="datetime-local"
+                  value={payForm.paidAt}
+                  max={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+                  onChange={(e) => setPayForm((p) => ({ ...p, paidAt: e.target.value }))}
+                />
+                <span className="pay-dt-hint">Defaults to now — change only if collecting for a past date</span>
               </div>
             </div>
             <div className="mini-modal-footer">

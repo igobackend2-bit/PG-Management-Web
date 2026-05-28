@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBranchStore } from '../../../store/branchStore';
+import { useToast } from '../../../shared/hooks/useToast';
 import { fetchDashboardStats, type DashboardStats } from '../services/dashboard.service';
 import './DashboardPage.scss';
 
@@ -20,6 +21,7 @@ const NAV_MODULES = [
 export function DashboardPage() {
   const { selectedBranch } = useBranchStore();
   const navigate = useNavigate();
+  const toast = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +29,10 @@ export function DashboardPage() {
     if (!selectedBranch) return;
     setLoading(true);
     try { setStats(await fetchDashboardStats(selectedBranch.id)); }
-    catch (err) { console.error('[Dashboard]', err); }
+    catch (err) {
+      console.error('[Dashboard]', err);
+      toast.error('Failed to load dashboard data. Please refresh.');
+    }
     finally { setLoading(false); }
   }, [selectedBranch]);
 

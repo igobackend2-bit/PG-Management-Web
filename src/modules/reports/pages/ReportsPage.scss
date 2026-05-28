@@ -10,11 +10,43 @@
     margin: $space-6 0 $space-4;
   }
 
+  // ── Header with Print button ───────────────────────────────────────────────
+  .btn-print {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: background-color $transition-fast;
+    &:hover { background: $color-grey-light; }
+  }
+
+  // ── Stat sub-label ─────────────────────────────────────────────────────────
+  .stat-sub {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: 2px;
+  }
+
+  // ── Two-column grid for breakdown cards ────────────────────────────────────
+  .report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+    margin-bottom: $space-5;
+
+    @include respond-to('md') { grid-template-columns: 1fr; }
+  }
+
   // ── Breakdown Card ─────────────────────────────────────────────────────────
   .breakdown-card {
     @include card;
     padding: $space-5;
-    max-width: 640px;
 
     h4 {
       font-size: $font-size-sm;
@@ -24,6 +56,10 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
+    &.trend-section {
+      grid-column: 1 / -1; // full width
+    }
   }
 
   .breakdown-table {
@@ -31,12 +67,32 @@
     border-collapse: collapse;
     font-size: $font-size-sm;
 
+    th {
+      padding: $space-2 $space-3;
+      text-align: left;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: $color-text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: $color-grey-light;
+      border-bottom: 1px solid $color-border;
+
+      &:not(:first-child) { text-align: right; }
+    }
+
     td {
       padding: $space-2 $space-3;
       border-bottom: 1px solid $color-border;
       color: $color-text-primary;
 
-      &:last-child { text-align: right; }
+      &:not(:first-child) { text-align: right; }
+    }
+
+    .pct {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      min-width: 42px;
     }
 
     .section-hdr td {
@@ -47,6 +103,7 @@
       letter-spacing: 0.5px;
       color: $color-text-muted;
       padding: $space-2 $space-3;
+      text-align: left !important;
     }
 
     .sub-total td {
@@ -65,5 +122,57 @@
     .col-green  { color: $color-green;  font-weight: $font-weight-semibold; }
     .col-red    { color: $color-red;    font-weight: $font-weight-semibold; }
     .amount     { font-family: $font-mono; }
+    .bold       { font-weight: $font-weight-semibold; }
+
+    .current-month-row td { background: rgba($color-primary, 0.04); }
   }
+
+  // ── Expense category breakdown bars ───────────────────────────────────────
+  .cat-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  .cat-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 90px 40px;
+    align-items: center;
+    gap: $space-2;
+    font-size: $font-size-sm;
+
+    .cat-name   { color: $color-text-primary; font-weight: $font-weight-medium; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cat-bar-wrap { height: 8px; background: $color-grey-light; border-radius: $border-radius-full; overflow: hidden; }
+    .cat-bar    { height: 100%; background: $color-red; border-radius: $border-radius-full; transition: width 0.4s ease; opacity: 0.75; }
+    .cat-amount { text-align: right; font-weight: $font-weight-semibold; color: $color-red; font-size: $font-size-xs; }
+    .cat-pct    { text-align: right; font-size: $font-size-xs; color: $color-text-muted; }
+  }
+
+  // ── Trend bar cells ────────────────────────────────────────────────────────
+  .trend-bar-cell {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  .trend-bar {
+    height: 6px;
+    min-width: 4px;
+    border-radius: $border-radius-full;
+
+    &.rev { background: $color-green; opacity: 0.7; }
+    &.exp { background: $color-red;   opacity: 0.7; }
+  }
+}
+
+// ── Print styles ───────────────────────────────────────────────────────────────
+@media print {
+  .app-header,
+  .app-sidebar,
+  .btn-print,
+  .controls-bar { display: none !important; }
+
+  .app-content { margin: 0 !important; padding: 0 !important; }
+  .reports-page { padding: 12px !important; }
+  .breakdown-card { box-shadow: none !important; border: 1px solid #ddd !important; }
 }

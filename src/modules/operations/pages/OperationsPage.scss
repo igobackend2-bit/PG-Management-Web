@@ -2,4 +2,193 @@
 
 .operations-page {
   @include base;
+
+  // ── Secondary tab bar (ticket status filters) ─────────────────────────────
+  .tab-bar.secondary {
+    margin-top: 0;
+    background: $color-grey-light;
+    border-radius: $border-radius-md;
+    padding: $space-1;
+    gap: $space-1;
+
+    .tab-btn {
+      font-size: $font-size-xs;
+      padding: $space-1 $space-3;
+      border-radius: $border-radius-sm;
+    }
+  }
+
+  // ── Attendance sub-tabs ────────────────────────────────────────────────────
+  .att-sub-tabs {
+    display: flex;
+    gap: $space-2;
+    margin-bottom: $space-4;
+
+    .tab-btn {
+      font-size: $font-size-sm;
+      padding: $space-2 $space-4;
+      border-radius: $border-radius-md;
+      border: 1px solid $color-border;
+      background: $color-surface;
+      color: $color-text-secondary;
+      cursor: pointer;
+      font-weight: $font-weight-medium;
+      transition: background $transition-fast, color $transition-fast;
+
+      &.active {
+        background: $color-primary;
+        color: $color-white;
+        border-color: $color-primary;
+      }
+      &:not(.active):hover { background: $color-grey-light; }
+    }
+  }
+
+  // ── Attendance mark buttons ────────────────────────────────────────────────
+  .att-mark-group {
+    display: flex;
+    gap: $space-1;
+    flex-wrap: wrap;
+  }
+
+  .att-btn {
+    padding: 3px $space-2;
+    border-radius: $border-radius-full;
+    border: 1px solid transparent;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: opacity $transition-fast, background $transition-fast;
+    opacity: 0.65;
+
+    &.active   { opacity: 1; }
+    &:disabled { cursor: not-allowed; opacity: 0.3; }
+
+    &.att-present { background: $color-green-light;   color: $color-green;   border-color: $color-green;   &.active { background: $color-green;   color: $color-white; } }
+    &.att-absent  { background: $color-red-light;     color: $color-red;     border-color: $color-red;     &.active { background: $color-red;     color: $color-white; } }
+    &.att-leave   { background: #fff7e6;               color: #b45309;        border-color: #f59e0b;        &.active { background: #f59e0b;        color: $color-white; } }
+    &.att-halfday { background: $color-primary-light;  color: $color-primary; border-color: $color-primary; &.active { background: $color-primary; color: $color-white; } }
+  }
+
+  // ── Shift checklist ────────────────────────────────────────────────────────
+  .shift-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    margin-top: $space-3;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-3 $space-4;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover:not(.locked) { background: $color-grey-light; }
+
+    input[type='checkbox'] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+
+    .check-label {
+      flex: 1;
+      font-size: $font-size-sm;
+      color: $color-text-primary;
+      font-weight: $font-weight-medium;
+    }
+
+    .check-role {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      background: $color-grey-light;
+      padding: 2px $space-2;
+      border-radius: $border-radius-full;
+    }
+
+    &.done {
+      background: $color-green-light;
+      border-color: #bbf7d0;
+      .check-label { color: $color-green; text-decoration: line-through; opacity: 0.75; }
+    }
+
+    &.locked { cursor: default; opacity: 0.85; }
+  }
+
+  .shift-footer {
+    @include flex-between;
+    margin-top: $space-4;
+    padding: $space-3 $space-4;
+    background: $color-grey-light;
+    border-radius: $border-radius-md;
+
+    .shift-progress {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+  }
+
+  .shift-locked-banner {
+    margin-bottom: $space-3;
+    padding: $space-3 $space-4;
+    background: $color-green-light;
+    border: 1px solid #bbf7d0;
+    border-radius: $border-radius-md;
+    color: $color-green;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  // ── Utility readings table ─────────────────────────────────────────────────
+  .util-input {
+    width: 100px;
+    padding: $space-1 $space-2;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    font-family: $font-primary;
+    background: $color-surface;
+    outline: none;
+    &:focus { border-color: $color-primary; }
+  }
+
+  .util-units {
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-sm;
+    color: $color-green;
+  }
+
+  .util-high { color: $color-red; }
+
+  .util-save { white-space: nowrap; }
+
+  // ── Day Close summary grid ─────────────────────────────────────────────────
+  .close-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-3;
+    margin-bottom: $space-4;
+
+    @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
+
+    .close-stat {
+      @include card;
+      padding: $space-4;
+      text-align: center;
+
+      .stat-value {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-bold;
+        color: $color-text-primary;
+      }
+
+      .stat-label {
+        font-size: $font-size-xs;
+        color: $color-text-muted;
+        margin-top: $space-1;
+      }
+    }
+  }
 }

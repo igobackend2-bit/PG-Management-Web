@@ -52,6 +52,38 @@ export type Database = {
           },
         ]
       }
+      app_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          owner_id: string
+          permissions: Json
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          permissions?: Json
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          permissions?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_roles_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           date: string
@@ -397,6 +429,108 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kitchen_stock_items: {
+        Row: {
+          branch_id: string
+          category: string | null
+          created_at: string | null
+          current_qty: number
+          id: string
+          low_stock_threshold: number
+          name: string
+          unit: string
+        }
+        Insert: {
+          branch_id: string
+          category?: string | null
+          created_at?: string | null
+          current_qty?: number
+          id?: string
+          low_stock_threshold?: number
+          name: string
+          unit?: string
+        }
+        Update: {
+          branch_id?: string
+          category?: string | null
+          created_at?: string | null
+          current_qty?: number
+          id?: string
+          low_stock_threshold?: number
+          name?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kitchen_stock_items_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kitchen_stock_transactions: {
+        Row: {
+          branch_id: string
+          created_at: string | null
+          food_purchase_id: string | null
+          id: string
+          item_id: string
+          notes: string | null
+          qty: number
+          recorded_at: string | null
+          recorded_by: string | null
+          type: string
+        }
+        Insert: {
+          branch_id: string
+          created_at?: string | null
+          food_purchase_id?: string | null
+          id?: string
+          item_id: string
+          notes?: string | null
+          qty: number
+          recorded_at?: string | null
+          recorded_by?: string | null
+          type: string
+        }
+        Update: {
+          branch_id?: string
+          created_at?: string | null
+          food_purchase_id?: string | null
+          id?: string
+          item_id?: string
+          notes?: string | null
+          qty?: number
+          recorded_at?: string | null
+          recorded_by?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kitchen_stock_transactions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kitchen_stock_transactions_food_purchase_id_fkey"
+            columns: ["food_purchase_id"]
+            isOneToOne: false
+            referencedRelation: "food_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kitchen_stock_transactions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "kitchen_stock_items"
             referencedColumns: ["id"]
           },
         ]
@@ -875,6 +1009,63 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          auth_user_id: string | null
+          branch_access: string[] | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          invited_at: string | null
+          is_active: boolean | null
+          last_login_at: string | null
+          owner_id: string
+          role_id: string | null
+        }
+        Insert: {
+          auth_user_id?: string | null
+          branch_access?: string[] | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          owner_id: string
+          role_id?: string | null
+        }
+        Update: {
+          auth_user_id?: string | null
+          branch_access?: string[] | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          owner_id?: string
+          role_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "app_roles"
             referencedColumns: ["id"]
           },
         ]

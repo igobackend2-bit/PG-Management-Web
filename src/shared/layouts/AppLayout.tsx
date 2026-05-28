@@ -9,16 +9,18 @@ import './AppLayout.scss';
 
 // ─── Sidebar nav items ────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { to: '/',             label: 'Dashboard',   icon: '▦',  end: true },
-  { to: '/branches',     label: 'Branches',    icon: '🏢' },
-  { to: '/tenants',      label: 'Tenants',     icon: '👤' },
-  { to: '/accounts',     label: 'Accounts',    icon: '₹'  },
-  { to: '/operations',   label: 'Operations',  icon: '🔧' },
-  { to: '/food',         label: 'Food',        icon: '🍽' },
-  { to: '/inventory',    label: 'Inventory',   icon: '📦' },
-  { to: '/staff',        label: 'Staff',       icon: '👷' },
-  { to: '/reports',      label: 'Reports',     icon: '📊' },
-  { to: '/documents',    label: 'Documents',   icon: '📄' },
+  { to: '/',             label: 'Dashboard',     icon: '▦',  end: true },
+  { to: '/ceo',          label: 'CEO Dashboard', icon: '📈' },
+  { to: '/branches',     label: 'Branches',      icon: '🏢' },
+  { to: '/tenants',      label: 'Tenants',       icon: '👤' },
+  { to: '/accounts',     label: 'Accounts',      icon: '₹'  },
+  { to: '/operations',   label: 'Operations',    icon: '🔧' },
+  { to: '/food',         label: 'Food',          icon: '🍽' },
+  { to: '/inventory',    label: 'Inventory',     icon: '📦' },
+  { to: '/staff',        label: 'Staff',         icon: '👷' },
+  { to: '/reports',      label: 'Reports',       icon: '📊' },
+  { to: '/documents',    label: 'Documents',     icon: '📄' },
+  { to: '/admin',        label: 'Admin',         icon: '⚙️' },
 ];
 
 export function AppLayout() {

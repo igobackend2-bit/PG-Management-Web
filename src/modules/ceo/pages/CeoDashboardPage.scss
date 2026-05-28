@@ -1,0 +1,264 @@
+@use '@/styles/module' as *;
+
+.ceo-page {
+  @include base;
+
+  .header-sub {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-top: 2px;
+  }
+
+  // ── KPI Cards row ─────────────────────────────────────────────────────────
+  .ceo-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: $space-3;
+    margin-bottom: $space-5;
+
+    @include respond-to('lg') { grid-template-columns: repeat(3, 1fr); }
+    @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .kpi-card {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-4;
+    border-radius: $border-radius-lg;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    box-shadow: $shadow-sm;
+
+    .kpi-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $border-radius-md;
+      flex-shrink: 0;
+    }
+
+    .kpi-body { flex: 1; min-width: 0; }
+
+    .kpi-value {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: $color-text-primary;
+      &.profit { color: $color-green; }
+      &.loss   { color: $color-red; }
+    }
+
+    .kpi-label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: $color-text-secondary;
+      margin-top: 2px;
+    }
+
+    .kpi-sub {
+      font-size: 10px;
+      color: $color-text-muted;
+      margin-top: 1px;
+    }
+
+    &.green  { .kpi-icon { background: $color-green-light;   color: $color-green;   } border-left: 3px solid $color-green;   }
+    &.red    { .kpi-icon { background: $color-red-light;     color: $color-red;     } border-left: 3px solid $color-red;     }
+    &.blue   { .kpi-icon { background: $color-primary-light; color: $color-primary; } border-left: 3px solid $color-primary; }
+    &.purple { .kpi-icon { background: #f3e8ff;               color: #7c3aed;        } border-left: 3px solid #7c3aed;        }
+    &.yellow { .kpi-icon { background: #fff7e6;               color: #d97706;        } border-left: 3px solid #d97706;        }
+    &.orange { .kpi-icon { background: #fff3e0;               color: #ea580c;        } border-left: 3px solid #ea580c;        }
+  }
+
+  // ── Section headings ──────────────────────────────────────────────────────
+  .ceo-section {
+    margin-bottom: $space-6;
+  }
+
+  .section-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: $space-4;
+    padding-bottom: $space-2;
+    border-bottom: 2px solid $color-border;
+  }
+
+  // ── Trend chart ───────────────────────────────────────────────────────────
+  .trend-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-3;
+    padding: $space-5;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-lg;
+    min-height: 220px;
+    position: relative;
+
+    .trend-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $space-1;
+    }
+
+    .trend-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 140px;
+    }
+
+    .trend-bar {
+      width: 18px;
+      border-radius: $border-radius-sm $border-radius-sm 0 0;
+      min-height: 4px;
+      transition: height 0.3s ease;
+      &.revenue { background: $color-green; }
+      &.expense { background: $color-red; opacity: 0.7; }
+    }
+
+    .trend-label {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      font-weight: $font-weight-medium;
+    }
+
+    .trend-value {
+      font-size: 10px;
+      color: $color-text-muted;
+    }
+
+    .trend-legend {
+      position: absolute;
+      top: $space-3;
+      right: $space-4;
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+
+      .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 4px;
+        &.revenue { background: $color-green; }
+        &.expense { background: $color-red; opacity: 0.7; }
+      }
+    }
+  }
+
+  // ── Occupancy bar in table ────────────────────────────────────────────────
+  .occ-cell {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+
+    .occ-bar-wrap {
+      width: 60px;
+      height: 6px;
+      background: $color-grey-light;
+      border-radius: $border-radius-full;
+      overflow: hidden;
+    }
+
+    .occ-bar {
+      height: 100%;
+      background: $color-primary;
+      border-radius: $border-radius-full;
+      transition: width 0.3s;
+    }
+  }
+
+  // ── Table totals row ──────────────────────────────────────────────────────
+  tfoot .totals-row {
+    background: $color-grey-light;
+    td { padding: $space-3 $space-4; font-size: $font-size-sm; }
+  }
+
+  // ── Branch performance cards ──────────────────────────────────────────────
+  .branch-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $space-4;
+  }
+
+  .branch-perf-card {
+    @include card;
+    padding: $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    .bpc-header {
+      @include flex-between;
+
+      .bpc-name {
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        color: $color-text-primary;
+      }
+
+      .bpc-profit {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        &.positive { color: $color-green; }
+        &.negative  { color: $color-red; }
+      }
+    }
+
+    .bpc-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: $space-2;
+      text-align: center;
+
+      .bpc-stat {
+        .bpc-stat-val {
+          display: block;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-bold;
+          color: $color-text-primary;
+        }
+        .bpc-stat-lbl {
+          display: block;
+          font-size: 10px;
+          color: $color-text-muted;
+          margin-top: 2px;
+        }
+      }
+    }
+
+    .bpc-occ-bar {
+      height: 6px;
+      background: $color-grey-light;
+      border-radius: $border-radius-full;
+      overflow: hidden;
+
+      .bpc-occ-fill {
+        height: 100%;
+        background: $color-primary;
+        border-radius: $border-radius-full;
+        transition: width 0.3s;
+      }
+    }
+
+    .bpc-footer {
+      @include flex-between;
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+    }
+  }
+
+  // ── Colour helpers ────────────────────────────────────────────────────────
+  .col-green  { color: $color-green; }
+  .col-red    { color: $color-red; }
+  .col-yellow { color: #d97706; }
+}

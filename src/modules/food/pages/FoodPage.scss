@@ -19,6 +19,95 @@
     font-weight: $font-weight-medium;
   }
 
+  // ── Tab badge ────────────────────────────────────────────────────────────
+  .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: $border-radius-full;
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    padding: 0 4px;
+    margin-left: $space-1;
+    &.red { background: $color-red; color: $color-white; }
+  }
+
+  // ── Low stock alert banner ────────────────────────────────────────────────
+  .low-stock-alert {
+    margin-bottom: $space-4;
+    padding: $space-3 $space-4;
+    background: #fff7e6;
+    border: 1px solid #f59e0b;
+    border-radius: $border-radius-md;
+    color: #b45309;
+    font-size: $font-size-sm;
+  }
+
+  // ── Kitchen sub-tabs ──────────────────────────────────────────────────────
+  .att-sub-tabs {
+    display: flex;
+    gap: $space-2;
+    margin-bottom: $space-4;
+    .tab-btn {
+      font-size: $font-size-sm;
+      padding: $space-2 $space-4;
+      border-radius: $border-radius-md;
+      border: 1px solid $color-border;
+      background: $color-surface;
+      color: $color-text-secondary;
+      cursor: pointer;
+      font-weight: $font-weight-medium;
+      transition: background $transition-fast, color $transition-fast;
+      &.active { background: $color-primary; color: $color-white; border-color: $color-primary; }
+      &:not(.active):hover { background: $color-grey-light; }
+    }
+  }
+
+  // ── Stock current qty display ─────────────────────────────────────────────
+  .stock-current-qty {
+    padding: $space-3 $space-4;
+    background: $color-grey-light;
+    border-radius: $border-radius-md;
+    margin-bottom: $space-4;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    strong { color: $color-text-primary; font-size: $font-size-md; }
+  }
+
+  // ── Transaction type toggle ───────────────────────────────────────────────
+  .txn-type-row {
+    display: flex;
+    gap: $space-2;
+  }
+  .txn-type-btn {
+    flex: 1;
+    padding: $space-3;
+    border-radius: $border-radius-md;
+    border: 2px solid $color-border;
+    background: $color-surface;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: all $transition-fast;
+    &.in  { &.active { background: $color-green-light; border-color: $color-green; color: $color-green; } }
+    &.out { &.active { background: $color-red-light;   border-color: $color-red;   color: $color-red;   } }
+    &:not(.active):hover { background: $color-grey-light; }
+  }
+
+  // ── Action btn colours ────────────────────────────────────────────────────
+  .action-btn.in {
+    background: $color-green-light;
+    color: $color-green;
+    border: 1px solid $color-green;
+    &:hover { background: $color-green; color: $color-white; }
+  }
+
+  // ── Colour helpers for stock ──────────────────────────────────────────────
+  .col-green { color: $color-green; }
+  .col-yellow { color: #b45309; }
+
   // ── Meal Grid ────────────────────────────────────────────────────────────
   .meal-grid {
     display: grid;

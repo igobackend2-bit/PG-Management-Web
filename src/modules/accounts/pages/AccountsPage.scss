@@ -334,4 +334,21 @@
       &:disabled { opacity: 0.6; cursor: not-allowed; }
     }
   }
+
+  // ── Payment date-time hint ─────────────────────────────────────────────────
+  .pay-dt-hint {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  // ── Paid time (shown smaller next to date in table) ───────────────────────
+  .paid-time {
+    display: inline-block;
+    font-size: 11px;
+    color: $color-text-muted;
+    margin-left: 2px;
+  }
 }

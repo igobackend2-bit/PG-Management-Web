@@ -353,11 +353,18 @@ export function OperationsPage() {
   // Tab-driven loading
   useEffect(() => {
     if (!selectedBranch) return;
-    if (tab === 'opening') { loadShift('morning', shiftDate); loadShift('night', shiftDate); }
+    if (tab === 'opening')    { loadShift('morning', shiftDate); loadShift('night', shiftDate); }
     if (tab === 'tickets')    loadTickets();
     if (tab === 'attendance') { loadAttendance(); loadVisitors(); }
     if (tab === 'utilities')  loadUtilities();
-    if (tab === 'closing')    { loadShift('night', shiftDate); }
+    if (tab === 'closing') {
+      // Load night shift + all live-summary data so stats aren't zero
+      loadShift('night', shiftDate);
+      loadTickets();
+      loadAttendance();
+      loadVisitors();
+      loadUtilities();
+    }
   }, [tab, selectedBranch]);
 
   useEffect(() => { if (tab === 'attendance') loadAttendance(); }, [attDate]);

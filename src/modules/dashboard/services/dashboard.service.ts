@@ -44,7 +44,7 @@ export async function fetchDashboardStats(branchId: string): Promise<DashboardSt
           .in('tenant_id', activeTenantIds)
           .eq('month', month)
       : Promise.resolve({ data: [] as Array<{ amount: number; paid_amount: number | null }> }),
-    supabase.from('tickets').select('id').eq('branch_id', branchId).eq('status', 'open'),
+    supabase.from('tickets').select('id').eq('branch_id', branchId).in('status', ['open', 'in_progress']),
     supabase.from('staff').select('id').eq('branch_id', branchId),
     supabase
       .from('expenses')

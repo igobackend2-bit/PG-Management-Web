@@ -9,7 +9,7 @@ export type CashbookEntry = Tables<'cashbook'>;
 export type TenantForRent = {
   id:   string;
   name: string;
-  rooms: { number: string } | null;
+  rooms: { number: string; rent: number } | null;
 };
 
 // ─── Rent ─────────────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ export async function fetchActiveTenantsForRent(
 ): Promise<TenantForRent[]> {
   const { data, error } = await supabase
     .from('tenants')
-    .select('id, name, rooms(number)')
+    .select('id, name, rooms(number, rent)')
     .eq('branch_id', branchId)
     .is('dov', null)
     .order('name');
@@ -55,11 +55,16 @@ export async function createRentRecord(
 export async function markRentPaid(
   id: string,
   paidAmount: number,
-  paymentMethod: string
+  paymentMethod: string,
+  paidAt?: string           // ISO string; defaults to now
 ): Promise<RentRecord> {
   const { data, error } = await supabase
     .from('rent_records')
-    .update({ paid_amount: paidAmount, paid_at: new Date().toISOString(), payment_method: paymentMethod })
+    .update({
+      paid_amount:    paidAmount,
+      paid_at:        paidAt ?? new Date().toISOString(),
+      payment_method: paymentMethod,
+    })
     .eq('id', id)
     .select()
     .single();
@@ -72,7 +77,8 @@ export async function upsertRentRecord(
   month: string,
   amount: number,
   paidAmount: number,
-  paymentMethod: string
+  paymentMethod: string,
+  paidAt?: string           // ISO string; defaults to now
 ): Promise<RentRecord> {
   // Check if record exists
   const { data: existing } = await supabase
@@ -82,17 +88,19 @@ export async function upsertRentRecord(
     .eq('month', month)
     .maybeSingle();
 
+  const resolvedPaidAt = paidAt ?? new Date().toISOString();
+
   if (existing) {
-    return markRentPaid(existing.id, paidAmount, paymentMethod);
+    return markRentPaid(existing.id, paidAmount, paymentMethod, resolvedPaidAt);
   }
   return createRentRecord({
-    tenant_id: tenantId,
+    tenant_id:      tenantId,
     month,
     amount,
-    paid_amount: paidAmount,
-    paid_at: new Date().toISOString(),
+    paid_amount:    paidAmount,
+    paid_at:        resolvedPaidAt,
     payment_method: paymentMethod,
-    is_partial: paidAmount < amount,
+    is_partial:     paidAmount < amount,
   });
 }
 

@@ -19,9 +19,10 @@ import { StaffPage } from '../modules/staff/pages/StaffPage';
 import { LeadsPage } from '../modules/leads/pages/LeadsPage';
 import { ReportsPage } from '../modules/reports/pages/ReportsPage';
 import { DocumentsPage } from '../modules/documents/pages/DocumentsPage';
+import { CeoDashboardPage } from '../modules/ceo/pages/CeoDashboardPage';
+import { AdminPage } from '../modules/admin/pages/AdminPage';
 
 // Legacy routes (kept for backward compat during migration)
-import RoomsPage from '../components/RoomsPage/RoomsPage';
 
 export function AppRouter() {
   return (
@@ -50,9 +51,10 @@ export function AppRouter() {
         <Route path="leads/*" element={<LeadsPage />} />
         <Route path="reports/*" element={<ReportsPage />} />
         <Route path="documents/*" element={<DocumentsPage />} />
+        <Route path="ceo/*" element={<CeoDashboardPage />} />
+        <Route path="admin/*" element={<AdminPage />} />
 
         {/* Legacy rooms route — kept during migration */}
-        <Route path="rooms" element={<RoomsPage />} />
       </Route>
 
       {/* ── Fallback ───────────────────────────────────────────────────── */}

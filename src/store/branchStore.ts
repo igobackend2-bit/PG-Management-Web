@@ -18,10 +18,19 @@ export const useBranchStore = create<BranchState>()(
       selectedBranch: null,
       isLoading: false,
       setBranches: (branches) =>
-        set((state) => ({
-          branches,
-          selectedBranch: state.selectedBranch ?? branches[0] ?? null,
-        })),
+        set((state) => {
+          // Validate that the persisted selectedBranch still exists in the new list.
+          // If a branch was deleted or the user switched accounts, fall back to first.
+          const stillExists = state.selectedBranch
+            ? branches.some((b) => b.id === state.selectedBranch!.id)
+            : false;
+          return {
+            branches,
+            selectedBranch: stillExists
+              ? state.selectedBranch
+              : (branches[0] ?? null),
+          };
+        }),
       setSelectedBranch: (branch) => set({ selectedBranch: branch }),
       setLoading: (isLoading) => set({ isLoading }),
     }),
