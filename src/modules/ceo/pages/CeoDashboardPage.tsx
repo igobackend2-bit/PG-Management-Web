@@ -129,6 +129,30 @@ export function CeoDashboardPage() {
                 <div className="kpi-sub">Across all branches</div>
               </div>
             </div>
+            <div className="kpi-card blue">
+              <div className="kpi-icon">👷</div>
+              <div className="kpi-body">
+                <div className="kpi-value">{stats.totalStaff}</div>
+                <div className="kpi-label">Total Staff</div>
+                <div className="kpi-sub">Across all branches</div>
+              </div>
+            </div>
+            <div className="kpi-card red">
+              <div className="kpi-icon">💵</div>
+              <div className="kpi-body">
+                <div className="kpi-value">{CURRENCY(stats.totalStaffSalary)}</div>
+                <div className="kpi-label">Monthly Payroll</div>
+                <div className="kpi-sub">Total staff salary</div>
+              </div>
+            </div>
+            <div className="kpi-card green">
+              <div className="kpi-icon">✅</div>
+              <div className="kpi-body">
+                <div className="kpi-value">{stats.totalPresentToday}/{stats.totalStaff}</div>
+                <div className="kpi-label">Present Today</div>
+                <div className="kpi-sub">{stats.totalAbsentToday} absent · {Math.max(0, stats.totalStaff - stats.totalPresentToday - stats.totalAbsentToday)} unmarked</div>
+              </div>
+            </div>
           </div>
 
           {/* ── Monthly Trend Chart ───────────────────────────────────────── */}
@@ -185,6 +209,8 @@ export function CeoDashboardPage() {
                       <th>Net Revenue</th>
                       <th>Open Tickets</th>
                       <th>Staff</th>
+                      <th>Present Today</th>
+                      <th>Payroll</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -214,6 +240,13 @@ export function CeoDashboardPage() {
                             : <span className="badge green">0</span>}
                         </td>
                         <td className="muted">{b.staffCount}</td>
+                        <td>
+                          <span className={b.presentToday > 0 ? 'col-green bold' : 'muted'}>
+                            {b.presentToday}/{b.staffCount}
+                          </span>
+                          {b.absentToday > 0 && <span className="col-red"> · {b.absentToday}✗</span>}
+                        </td>
+                        <td className="muted">{CURRENCY(b.staffSalary)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -229,7 +262,9 @@ export function CeoDashboardPage() {
                         {stats.totalNetProfit >= 0 ? '+' : ''}{CURRENCY(stats.totalNetProfit)}
                       </td>
                       <td><strong>{stats.openTickets}</strong></td>
-                      <td>—</td>
+                      <td><strong>{stats.totalStaff}</strong></td>
+                      <td className="col-green bold">{stats.totalPresentToday}/{stats.totalStaff}</td>
+                      <td className="col-red bold">{CURRENCY(stats.totalStaffSalary)}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -268,6 +303,7 @@ export function CeoDashboardPage() {
                   </div>
                   <div className="bpc-footer">
                     <span>{b.totalTenants} tenants</span>
+                    <span>👷 {b.staffCount} staff · {CURRENCY(b.staffSalary)}</span>
                     <span>{b.openTickets > 0 ? `⚠️ ${b.openTickets} tickets` : '✅ No open tickets'}</span>
                   </div>
                 </div>

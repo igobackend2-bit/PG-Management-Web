@@ -90,6 +90,18 @@ export function DashboardPage() {
               <span className="kpi-label">Net P&L</span>
               <span className="kpi-sub">Exp: {CURRENCY(stats.expensesThisMonth + stats.foodCostThisMonth)}</span>
             </div>
+            <div className="kpi-card kpi-blue">
+              <span className="kpi-value">{stats.totalStaff}</span>
+              <span className="kpi-label">Staff</span>
+              <span className="kpi-sub">Payroll: {CURRENCY(stats.staffSalary)}/mo</span>
+            </div>
+            <div className="kpi-card kpi-green">
+              <span className="kpi-value">{stats.presentToday}/{stats.totalStaff}</span>
+              <span className="kpi-label">Present Today</span>
+              <span className="kpi-sub">
+                {stats.absentToday} absent · {Math.max(0, stats.totalStaff - stats.presentToday - stats.absentToday)} unmarked
+              </span>
+            </div>
           </div>
 
           <h3 className="section-title">Quick Access</h3>

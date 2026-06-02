@@ -9,6 +9,9 @@ export interface DashboardStats {
   rentDueThisMonth: number;
   openTickets: number;
   totalStaff: number;
+  staffSalary: number;
+  presentToday: number;
+  absentToday: number;
   expensesThisMonth: number;
   foodCostThisMonth: number;
 }
@@ -35,8 +38,10 @@ export async function fetchDashboardStats(branchId: string): Promise<DashboardSt
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const occupiedBeds = allBeds.filter((b: any) => b.is_occupied).length;
 
+  const today = new Date().toISOString().slice(0, 10);
+
   // 3. Everything else in parallel
-  const [rentRes, ticketsRes, staffRes, expRes, foodRes] = await Promise.all([
+  const [rentRes, ticketsRes, staffRes, expRes, foodRes, attRes] = await Promise.all([
     activeTenantIds.length > 0
       ? supabase
           .from('rent_records')
@@ -45,7 +50,7 @@ export async function fetchDashboardStats(branchId: string): Promise<DashboardSt
           .eq('month', month)
       : Promise.resolve({ data: [] as Array<{ amount: number; paid_amount: number | null }> }),
     supabase.from('tickets').select('id').eq('branch_id', branchId).in('status', ['open', 'in_progress']),
-    supabase.from('staff').select('id').eq('branch_id', branchId),
+    supabase.from('staff').select('id, salary').eq('branch_id', branchId),
     supabase
       .from('expenses')
       .select('amount')
@@ -58,9 +63,15 @@ export async function fetchDashboardStats(branchId: string): Promise<DashboardSt
       .eq('branch_id', branchId)
       .gte('date', `${month}-01`)
       .lte('date', `${month}-31`),
+    supabase
+      .from('attendance')
+      .select('status, staff!inner(branch_id)')
+      .eq('date', today)
+      .eq('staff.branch_id', branchId),
   ]);
 
   const recs = (rentRes.data ?? []) as Array<{ amount: number; paid_amount: number | null }>;
+  const attRows = (attRes.data ?? []) as unknown as Array<{ status: string }>;
 
   return {
     activeTenants:          activeTenantIds.length,
@@ -71,6 +82,9 @@ export async function fetchDashboardStats(branchId: string): Promise<DashboardSt
     rentDueThisMonth:       recs.reduce((s, r) => s + r.amount, 0),
     openTickets:            (ticketsRes.data ?? []).length,
     totalStaff:             (staffRes.data  ?? []).length,
+    staffSalary:            ((staffRes.data ?? []) as Array<{ salary: number | null }>).reduce((s, st) => s + (st.salary ?? 0), 0),
+    presentToday:           attRows.filter((a) => a.status === 'present' || a.status === 'halfday').length,
+    absentToday:            attRows.filter((a) => a.status === 'absent').length,
     expensesThisMonth:      ((expRes.data   ?? []) as Array<{ amount: number }>).reduce((s, e) => s + e.amount, 0),
     foodCostThisMonth:      ((foodRes.data  ?? []) as Array<{ total: number }>).reduce((s, p) => s + p.total, 0),
   };

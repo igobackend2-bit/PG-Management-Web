@@ -275,10 +275,17 @@ export function BranchesModulePage() {
     if (!window.confirm(`Delete "${b.name}"? This is irreversible.`)) return;
     try {
       const { error } = await supabase.from('branches').delete().eq('id', b.id);
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase delete error:', error);
+        throw new Error(error.message || 'Database error');
+      }
       toast.success('Branch deleted.');
       loadBranches(); refreshStore();
-    } catch { toast.error('Failed to delete branch.'); }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to delete branch: ${msg}`);
+      console.error('Delete branch error details:', err);
+    }
   }
 
   function goToRooms(b: BranchRow) {
@@ -296,21 +303,44 @@ export function BranchesModulePage() {
 
   async function handleDeleteRoom(r: RoomWithBeds) {
     if (!window.confirm(`Delete Room ${r.number}?`)) return;
-    try { await deleteRoom(r.id); toast.success('Room deleted.'); loadRooms(); }
-    catch { toast.error('Failed to delete room.'); }
+    try { 
+      await deleteRoom(r.id); 
+      toast.success('Room deleted.'); 
+      loadRooms(); 
+    }
+    catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete room.';
+      toast.error(`Failed to delete room: ${msg}`);
+      console.error('Delete room error:', err);
+    }
   }
 
   async function handleAddBed(r: RoomWithBeds) {
     setAddingBed(r.id);
-    try { await addBed(r.id, r.beds.length); loadRooms(); }
-    catch { toast.error('Failed to add bed.'); }
+    try { 
+      await addBed(r.id, r.beds.length); 
+      loadRooms(); 
+    }
+    catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to add bed.';
+      toast.error(`Failed to add bed: ${msg}`);
+      console.error('Add bed error:', err);
+    }
     finally { setAddingBed(''); }
   }
 
   async function handleDeleteBed(bed: BedRow) {
     if (!window.confirm(`Delete Bed ${bed.label}?`)) return;
-    try { await deleteBed(bed.id); toast.success('Bed deleted.'); loadRooms(); }
-    catch { toast.error('Failed to delete bed.'); }
+    try { 
+      await deleteBed(bed.id); 
+      toast.success('Bed deleted.'); 
+      loadRooms(); 
+    }
+    catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete bed.';
+      toast.error(`Failed to delete bed: ${msg}`);
+      console.error('Delete bed error:', err);
+    }
   }
 
   // ── Stats ──────────────────────────────────────────────────────────────────

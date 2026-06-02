@@ -6,11 +6,24 @@ import {
   fetchAttendanceForDate, upsertAttendance,
   type StaffRow, type AttendanceRow, type AttendanceStatus,
 } from '../services/staff.service';
+import { getErrorMessage } from '../../../shared/utils/error';
 import './StaffPage.scss';
 
 type Tab = 'staff' | 'attendance';
 
-const ROLES = ['Warden', 'Cook', 'Cleaner', 'Security', 'Maintenance', 'Manager', 'Other'];
+// value = canonical lowercase stored in DB (must match staff_role_check constraint);
+// label = friendly display text.
+const ROLES: { value: string; label: string }[] = [
+  { value: 'warden',      label: 'Warden' },
+  { value: 'cook',        label: 'Cook' },
+  { value: 'cleaner',     label: 'Cleaner' },
+  { value: 'security',    label: 'Security' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'manager',     label: 'Manager' },
+  { value: 'other',       label: 'Other' },
+];
+const ROLE_LABEL: Record<string, string> = Object.fromEntries(ROLES.map((r) => [r.value, r.label]));
+const roleLabel = (role: string) => ROLE_LABEL[role] ?? (role.charAt(0).toUpperCase() + role.slice(1));
 const ATT_STATUSES: AttendanceStatus[] = ['present', 'absent', 'halfday', 'leave'];
 const ATT_LABEL: Record<AttendanceStatus | 'none', string> = {
   present: 'Present', absent: 'Absent', halfday: 'Half Day', leave: 'On Leave', none: '— Not Marked —',
@@ -31,7 +44,7 @@ function StaffModal({ branchId, staff, onSave, onClose }: ModalProps) {
   const isEdit = Boolean(staff);
   const [form, setForm] = useState({
     name:      staff?.name      ?? '',
-    role:      staff?.role      ?? 'Warden',
+    role:      staff?.role      ?? 'warden',
     phone:     staff?.phone     ?? '',
     salary:    String(staff?.salary ?? ''),
     joined_at: staff?.joined_at ?? todayStr(),
@@ -58,7 +71,7 @@ function StaffModal({ branchId, staff, onSave, onClose }: ModalProps) {
       else await createStaff(payload);
       onSave();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save.');
+      setError(getErrorMessage(err, 'Failed to save.'));
     } finally { setSaving(false); }
   }
 
@@ -79,7 +92,7 @@ function StaffModal({ branchId, staff, onSave, onClose }: ModalProps) {
               <div className="form-group">
                 <label>Role</label>
                 <select value={form.role} onChange={(e) => set('role', e.target.value)}>
-                  {ROLES.map((r) => <option key={r}>{r}</option>)}
+                  {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
               </div>
               <div className="form-group">
@@ -197,8 +210,8 @@ export function StaffPage() {
         <>
           <div className="stats-row">
             <div className="stat-card blue"><div className="stat-value">{staff.length}</div><div className="stat-label">Total Staff</div></div>
-            <div className="stat-card green"><div className="stat-value">{staff.filter((s) => s.role === 'Warden').length}</div><div className="stat-label">Wardens</div></div>
-            <div className="stat-card yellow"><div className="stat-value">{staff.filter((s) => s.role === 'Cook').length}</div><div className="stat-label">Kitchen Staff</div></div>
+            <div className="stat-card green"><div className="stat-value">{staff.filter((s) => s.role === 'warden').length}</div><div className="stat-label">Wardens</div></div>
+            <div className="stat-card yellow"><div className="stat-value">{staff.filter((s) => s.role === 'cook').length}</div><div className="stat-label">Kitchen Staff</div></div>
             <div className="stat-card red"><div className="stat-value">{CURRENCY(totalSalary)}</div><div className="stat-label">Monthly Salary</div></div>
           </div>
 
@@ -220,7 +233,7 @@ export function StaffPage() {
                   {staff.map((s) => (
                     <tr key={s.id}>
                       <td className="bold">{s.name}</td>
-                      <td><span className="badge none" style={{ background: '#e8f0fd', color: '#3171e0' }}>{s.role}</span></td>
+                      <td><span className="badge none" style={{ background: '#e8f0fd', color: '#3171e0' }}>{roleLabel(s.role)}</span></td>
                       <td className="muted">{s.phone ?? '—'}</td>
                       <td>{s.salary ? CURRENCY(s.salary) : '—'}</td>
                       <td className="muted">{s.joined_at ?? '—'}</td>
@@ -273,7 +286,7 @@ export function StaffPage() {
                     return (
                       <tr key={s.id}>
                         <td className="bold">{s.name}</td>
-                        <td className="muted">{s.role}</td>
+                        <td className="muted">{roleLabel(s.role)}</td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             {status && <span className={`badge ${status}`}>{ATT_LABEL[status]}</span>}

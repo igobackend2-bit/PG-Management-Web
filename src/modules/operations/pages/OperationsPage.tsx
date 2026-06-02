@@ -4,9 +4,8 @@ import { useToast } from '../../../shared/hooks/useToast';
 
 // ── Services ──────────────────────────────────────────────────────────────────
 import {
-  fetchTickets, createTicket, updateTicket, resolveTicket, deleteTicket,
-  fetchStaffOptions, fetchRoomOptions,
-  type TicketWithDetails, type StaffOption, type RoomOption,
+  fetchRoomOptions,
+  type RoomOption,
 } from '../services/operations.service';
 import {
   fetchShiftChecklist, upsertShiftChecklist, lockShift,
@@ -28,17 +27,10 @@ import {
 import './OperationsPage.scss';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-type MainTab     = 'opening' | 'tickets' | 'attendance' | 'utilities' | 'closing';
+type MainTab     = 'opening' | 'attendance' | 'utilities' | 'closing';
 type AttSubTab   = 'staff' | 'visitors';
-type StatusFilter = 'all' | 'open' | 'in_progress' | 'resolved' | 'closed';
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
-
-const CATEGORIES   = ['Plumbing', 'Electrical', 'Cleaning', 'WiFi', 'Food', 'Pest Control', 'Furniture', 'Other'];
-const STATUSES: StatusFilter[] = ['all', 'open', 'in_progress', 'resolved', 'closed'];
-const STATUS_LABEL: Record<string, string> = {
-  all: 'All', open: 'Open', in_progress: 'In Progress', resolved: 'Resolved', closed: 'Closed',
-};
 
 const ATT_STATUSES = [
   { key: 'present',  label: 'Present',  cls: 'att-present'  },
@@ -55,106 +47,6 @@ function fmtDate(iso: string | null) {
 function fmtTime(iso: string | null) {
   if (!iso) return '—';
   return new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-}
-
-// ─── TicketModal ──────────────────────────────────────────────────────────────
-function TicketModal({ branchId, ticket, staffOptions, roomOptions, onSave, onClose }: {
-  branchId: string; ticket: TicketWithDetails | null;
-  staffOptions: StaffOption[]; roomOptions: RoomOption[];
-  onSave: () => void; onClose: () => void;
-}) {
-  const isEdit = Boolean(ticket);
-  const [form, setForm] = useState({
-    category:    ticket?.category    ?? 'Plumbing',
-    description: ticket?.description ?? '',
-    room_id:     ticket?.room_id     ?? '',
-    assigned_to: ticket?.assigned_to ?? '',
-    cost:        String(ticket?.cost ?? ''),
-    status:      ticket?.status      ?? 'open',
-  });
-  const [saving, setSaving] = useState(false);
-  const [error, setError]   = useState('');
-  const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.description.trim()) { setError('Description is required.'); return; }
-    setSaving(true); setError('');
-    try {
-      const payload = {
-        branch_id:   branchId,
-        category:    form.category,
-        description: form.description.trim(),
-        room_id:     form.room_id     || null,
-        assigned_to: form.assigned_to || null,
-        cost:        form.cost ? Number(form.cost) : null,
-        status:      form.status,
-      };
-      if (isEdit && ticket) await updateTicket(ticket.id, payload);
-      else await createTicket(payload);
-      onSave();
-    } catch (err: unknown) { setError(err instanceof Error ? err.message : 'Failed to save.'); }
-    finally { setSaving(false); }
-  }
-
-  return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-panel">
-        <div className="modal-header">
-          <h3>{isEdit ? 'Edit Ticket' : 'Create Ticket'}</h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body">
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Category</label>
-                <select value={form.category} onChange={(e) => set('category', e.target.value)}>
-                  {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Status</label>
-                <select value={form.status} onChange={(e) => set('status', e.target.value)}>
-                  <option value="open">Open</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Room</label>
-                <select value={form.room_id} onChange={(e) => set('room_id', e.target.value)}>
-                  <option value="">— No specific room —</option>
-                  {roomOptions.map((r) => <option key={r.id} value={r.id}>Room {r.number}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Assign To</label>
-                <select value={form.assigned_to} onChange={(e) => set('assigned_to', e.target.value)}>
-                  <option value="">— Unassigned —</option>
-                  {staffOptions.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Estimated Cost (₹)</label>
-                <input type="number" value={form.cost} onChange={(e) => set('cost', e.target.value)} placeholder="0" min="0" />
-              </div>
-              <div className="form-group full">
-                <label>Description *</label>
-                <textarea value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Describe the issue…" required />
-              </div>
-            </div>
-          </div>
-          <div className="modal-footer">
-            <span className="modal-error">{error}</span>
-            <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-save" disabled={saving}>{saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Ticket'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
 }
 
 // ─── VisitorModal ─────────────────────────────────────────────────────────────
@@ -243,16 +135,8 @@ export function OperationsPage() {
   const [closeLockedAt, setCloseLockedAt] = useState<string | null>(null);
   const [savingShift, setSavingShift] = useState(false);
 
-  // ── TICKETS STATE ────────────────────────────────────────────────────────────
-  const [tickets,      setTickets]      = useState<TicketWithDetails[]>([]);
-  const [staffOpts,    setStaffOpts]    = useState<StaffOption[]>([]);
+  // ── SHARED OPTIONS (room list for the Visitor modal) ──────────────────────────
   const [roomOpts,     setRoomOpts]     = useState<RoomOption[]>([]);
-  const [loadingT,     setLoadingT]     = useState(false);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [search,       setSearch]       = useState('');
-  const [catFilter,    setCatFilter]    = useState('all');
-  const [showTicketModal, setShowTicketModal] = useState(false);
-  const [editTicket,   setEditTicket]   = useState<TicketWithDetails | null>(null);
 
   // ── ATTENDANCE STATE ─────────────────────────────────────────────────────────
   const [attSubTab,    setAttSubTab]    = useState<AttSubTab>('staff');
@@ -301,18 +185,10 @@ export function OperationsPage() {
     } catch { /* silent */ }
   }, [selectedBranch]);
 
-  const loadTickets = useCallback(async () => {
+  const loadRoomOpts = useCallback(async () => {
     if (!selectedBranch) return;
-    setLoadingT(true);
-    try {
-      const [t, s, r] = await Promise.all([
-        fetchTickets(selectedBranch.id),
-        fetchStaffOptions(selectedBranch.id),
-        fetchRoomOptions(selectedBranch.id),
-      ]);
-      setTickets(t); setStaffOpts(s); setRoomOpts(r);
-    } catch { toast.error('Failed to load tickets.'); }
-    finally { setLoadingT(false); }
+    try { setRoomOpts(await fetchRoomOptions(selectedBranch.id)); }
+    catch { /* non-critical: room list only used by Visitor modal */ }
   }, [selectedBranch]);
 
   const loadAttendance = useCallback(async () => {
@@ -354,13 +230,11 @@ export function OperationsPage() {
   useEffect(() => {
     if (!selectedBranch) return;
     if (tab === 'opening')    { loadShift('morning', shiftDate); loadShift('night', shiftDate); }
-    if (tab === 'tickets')    loadTickets();
-    if (tab === 'attendance') { loadAttendance(); loadVisitors(); }
+    if (tab === 'attendance') { loadAttendance(); loadVisitors(); loadRoomOpts(); }
     if (tab === 'utilities')  loadUtilities();
     if (tab === 'closing') {
       // Load night shift + all live-summary data so stats aren't zero
       loadShift('night', shiftDate);
-      loadTickets();
       loadAttendance();
       loadVisitors();
       loadUtilities();
@@ -397,20 +271,6 @@ export function OperationsPage() {
       toast.success(shift === 'morning' ? 'Morning opening locked!' : 'Night closing locked!');
     } catch { toast.error('Failed to lock shift.'); }
     finally { setSavingShift(false); }
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // HANDLERS — TICKETS
-  // ─────────────────────────────────────────────────────────────────────────────
-  async function handleResolve(t: TicketWithDetails) {
-    try { await resolveTicket(t.id); toast.success('Ticket resolved.'); loadTickets(); }
-    catch { toast.error('Failed to resolve.'); }
-  }
-
-  async function handleDeleteTicket(t: TicketWithDetails) {
-    if (!window.confirm('Delete this ticket?')) return;
-    try { await deleteTicket(t.id); toast.success('Ticket deleted.'); loadTickets(); }
-    catch { toast.error('Failed to delete.'); }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -467,16 +327,6 @@ export function OperationsPage() {
   // ─────────────────────────────────────────────────────────────────────────────
   // DERIVED STATS
   // ─────────────────────────────────────────────────────────────────────────────
-  const openCount = tickets.filter((t) => t.status === 'open').length;
-  const inProgress = tickets.filter((t) => t.status === 'in_progress').length;
-  const resolved   = tickets.filter((t) => t.status === 'resolved').length;
-  const totalCost  = tickets.reduce((s, t) => s + (t.cost ?? 0), 0);
-
-  const filteredTickets = tickets
-    .filter((t) => statusFilter === 'all' || t.status === statusFilter)
-    .filter((t) => catFilter === 'all' || t.category.toLowerCase() === catFilter.toLowerCase())
-    .filter((t) => !search || t.description.toLowerCase().includes(search.toLowerCase()) || t.category.toLowerCase().includes(search.toLowerCase()));
-
   const presentCount  = attendance.filter((a) => a.status === 'present').length;
   const absentCount   = attendance.filter((a) => a.status === 'absent').length;
   const leaveCount    = attendance.filter((a) => a.status === 'leave').length;
@@ -505,9 +355,6 @@ export function OperationsPage() {
           <h2>Daily Operations</h2>
           <span className="branch-tag">{selectedBranch.name}</span>
         </div>
-        {tab === 'tickets' && (
-          <button className="btn-add" onClick={() => { setEditTicket(null); setShowTicketModal(true); }}>+ Create Ticket</button>
-        )}
         {tab === 'attendance' && attSubTab === 'visitors' && (
           <button className="btn-add" onClick={() => setShowVisModal(true)}>+ Add Visitor</button>
         )}
@@ -516,7 +363,6 @@ export function OperationsPage() {
       {/* ── Main Tabs ──────────────────────────────────────────────────────── */}
       <div className="tab-bar">
         <button className={`tab-btn ${tab === 'opening'    ? 'active' : ''}`} onClick={() => setTab('opening')}>    🌅 Morning Opening</button>
-        <button className={`tab-btn ${tab === 'tickets'    ? 'active' : ''}`} onClick={() => setTab('tickets')}>    🎫 Tickets ({openCount} open)</button>
         <button className={`tab-btn ${tab === 'attendance' ? 'active' : ''}`} onClick={() => setTab('attendance')}>👥 Attendance & Visitors</button>
         <button className={`tab-btn ${tab === 'utilities'  ? 'active' : ''}`} onClick={() => setTab('utilities')}>  ⚡ Utility Readings</button>
         <button className={`tab-btn ${tab === 'closing'    ? 'active' : ''}`} onClick={() => setTab('closing')}>    🌙 Night Closing</button>
@@ -561,79 +407,6 @@ export function OperationsPage() {
               >
                 {savingShift ? 'Locking…' : '🔒 Lock Morning Opening'}
               </button>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* ══ TICKETS ════════════════════════════════════════════════════════════ */}
-      {tab === 'tickets' && (
-        <>
-          <div className="stats-row">
-            <div className="stat-card yellow"><div className="stat-value">{openCount}</div><div className="stat-label">Open</div></div>
-            <div className="stat-card blue"><div className="stat-value">{inProgress}</div><div className="stat-label">In Progress</div></div>
-            <div className="stat-card green"><div className="stat-value">{resolved}</div><div className="stat-label">Resolved</div></div>
-            <div className="stat-card red"><div className="stat-value">₹{totalCost.toLocaleString('en-IN')}</div><div className="stat-label">Maintenance Cost</div></div>
-          </div>
-          <div className="tab-bar secondary">
-            {STATUSES.map((s) => (
-              <button key={s} className={`tab-btn ${statusFilter === s ? 'active' : ''}`} onClick={() => setStatusFilter(s)}>
-                {STATUS_LABEL[s]}{s !== 'all' && ` (${tickets.filter((t) => t.status === s).length})`}
-              </button>
-            ))}
-          </div>
-          <div className="controls-bar">
-            <div className="search-wrap">
-              <i className="search-icon">🔍</i>
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search description…" />
-            </div>
-            <div className="filter-group">
-              <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
-                <option value="all">All Categories</option>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-          </div>
-          {loadingT ? (
-            <div className="loading-wrap"><span className="loader" /></div>
-          ) : filteredTickets.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🔧</div>
-              <div className="empty-title">No Tickets Found</div>
-              <p>{search || statusFilter !== 'all' ? 'Try adjusting the filters.' : 'Create a ticket to track maintenance issues.'}</p>
-            </div>
-          ) : (
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr><th>#</th><th>Category</th><th>Description</th><th>Room</th><th>Assigned</th><th>Status</th><th>Cost</th><th>Date</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                  {filteredTickets.map((t, i) => (
-                    <tr key={t.id}>
-                      <td className="muted">{i + 1}</td>
-                      <td><span className="bold">{t.category}</span></td>
-                      <td style={{ maxWidth: 200 }}>
-                        <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.description}</span>
-                      </td>
-                      <td className="muted">{t.rooms ? `Room ${t.rooms.number}` : '—'}</td>
-                      <td className="muted">{t.assignee?.name ?? '—'}</td>
-                      <td><span className={`badge ${t.status}`}>{STATUS_LABEL[t.status ?? 'open']}</span></td>
-                      <td className="muted">{t.cost ? `₹${t.cost.toLocaleString('en-IN')}` : '—'}</td>
-                      <td className="muted">{fmtDate(t.created_at)}</td>
-                      <td>
-                        <div className="actions-cell">
-                          <button className="action-btn edit"   onClick={() => { setEditTicket(t); setShowTicketModal(true); }}>Edit</button>
-                          {t.status !== 'resolved' && t.status !== 'closed' && (
-                            <button className="action-btn resolve" onClick={() => handleResolve(t)}>✓ Resolve</button>
-                          )}
-                          <button className="action-btn delete" onClick={() => handleDeleteTicket(t)}>Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           )}
         </>
@@ -845,10 +618,6 @@ export function OperationsPage() {
           {/* Live summary */}
           <div className="close-summary">
             <div className="close-stat">
-              <div className="stat-value">{openCount}</div>
-              <div className="stat-label">Open Tickets</div>
-            </div>
-            <div className="close-stat">
               <div className="stat-value">{presentCount}</div>
               <div className="stat-label">Present Today</div>
             </div>
@@ -901,16 +670,6 @@ export function OperationsPage() {
       )}
 
       {/* ── Modals ─────────────────────────────────────────────────────────── */}
-      {showTicketModal && selectedBranch && (
-        <TicketModal
-          branchId={selectedBranch.id}
-          ticket={editTicket}
-          staffOptions={staffOpts}
-          roomOptions={roomOpts}
-          onSave={() => { toast.success(editTicket ? 'Ticket updated.' : 'Ticket created!'); setShowTicketModal(false); setEditTicket(null); loadTickets(); }}
-          onClose={() => { setShowTicketModal(false); setEditTicket(null); }}
-        />
-      )}
       {showVisModal && selectedBranch && (
         <VisitorModal
           branchId={selectedBranch.id}

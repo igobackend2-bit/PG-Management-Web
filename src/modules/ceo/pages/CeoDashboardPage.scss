@@ -12,11 +12,10 @@
   // ── KPI Cards row ─────────────────────────────────────────────────────────
   .ceo-kpi-row {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: $space-3;
     margin-bottom: $space-5;
 
-    @include respond-to('lg') { grid-template-columns: repeat(3, 1fr); }
     @include respond-to('md') { grid-template-columns: repeat(2, 1fr); }
   }
 

@@ -14,6 +14,9 @@ export type BranchSummary = {
   netRevenue:    number;   // rentCollected - totalExpenses
   openTickets:   number;
   staffCount:    number;
+  staffSalary:   number;   // total monthly salary of this branch's staff
+  presentToday:  number;   // staff marked present today
+  absentToday:   number;   // staff marked absent today
 };
 
 export type CeoStats = {
@@ -26,6 +29,10 @@ export type CeoStats = {
   totalOccupied:  number;
   avgOccupancyPct: number;
   openTickets:    number;
+  totalStaff:     number;
+  totalStaffSalary: number;
+  totalPresentToday: number;
+  totalAbsentToday:  number;
 };
 
 // ─── Owner branches helper ────────────────────────────────────────────────────
@@ -60,8 +67,12 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
       totalRevenue: 0, totalExpenses: 0, totalNetProfit: 0,
       totalTenants: 0, totalBeds: 0, totalOccupied: 0,
       avgOccupancyPct: 0, openTickets: 0,
+      totalStaff: 0, totalStaffSalary: 0,
+      totalPresentToday: 0, totalAbsentToday: 0,
     };
   }
+
+  const today = new Date().toISOString().slice(0, 10);
 
   // Parallel fetch all data
   const [
@@ -71,6 +82,7 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
     expensesRes,
     ticketsRes,
     staffRes,
+    attendanceRes,
   ] = await Promise.all([
     supabase.from('beds').select('id, is_occupied, rooms!inner(branch_id)')
       .in('rooms.branch_id', branchIds),
@@ -86,7 +98,11 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
     supabase.from('tickets').select('branch_id, status')
       .in('branch_id', branchIds)
       .neq('status', 'resolved'),
-    supabase.from('staff').select('id, branch_id').in('branch_id', branchIds),
+    supabase.from('staff').select('id, branch_id, salary').in('branch_id', branchIds),
+    supabase.from('attendance')
+      .select('staff_id, status, staff!inner(branch_id)')
+      .eq('date', today)
+      .in('staff.branch_id', branchIds),
   ]);
 
   const beds      = (bedsRes.data ?? []) as unknown as { id: string; is_occupied: boolean | null; rooms: { branch_id: string } }[];
@@ -94,7 +110,8 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
   const rentRecs  = (rentRes.data  ?? []) as unknown as { tenant_id: string; amount: number; paid_amount: number | null; tenants: { branch_id: string } }[];
   const expenses  = expensesRes.data ?? [];
   const tickets   = ticketsRes.data ?? [];
-  const staff     = staffRes.data ?? [];
+  const staff     = (staffRes.data ?? []) as { id: string; branch_id: string; salary: number | null }[];
+  const attendance = (attendanceRes.data ?? []) as unknown as { staff_id: string; status: string; staff: { branch_id: string } }[];
 
   const summaries: BranchSummary[] = branches.map(b => {
     const bBeds     = beds.filter(bd => (bd.rooms as { branch_id: string }).branch_id === b.id);
@@ -103,6 +120,7 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
     const bExpenses = expenses.filter(e => e.branch_id === b.id);
     const bTickets  = tickets.filter(t => t.branch_id === b.id);
     const bStaff    = staff.filter(s => s.branch_id === b.id);
+    const bAtt      = attendance.filter(a => a.staff.branch_id === b.id);
 
     const totalBeds    = bBeds.length;
     const occupiedBeds = bBeds.filter(bd => bd.is_occupied).length;
@@ -123,6 +141,9 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
       netRevenue:   rentCollected - totalExpenses,
       openTickets:  bTickets.length,
       staffCount:   bStaff.length,
+      staffSalary:  bStaff.reduce((s, st) => s + (st.salary ?? 0), 0),
+      presentToday: bAtt.filter(a => a.status === 'present' || a.status === 'halfday').length,
+      absentToday:  bAtt.filter(a => a.status === 'absent').length,
     };
   });
 
@@ -141,6 +162,10 @@ export async function fetchCeoStats(month: string): Promise<CeoStats> {
     totalOccupied,
     avgOccupancyPct: totalBeds > 0 ? Math.round((totalOccupied / totalBeds) * 100) : 0,
     openTickets:     summaries.reduce((s, b) => s + b.openTickets, 0),
+    totalStaff:      summaries.reduce((s, b) => s + b.staffCount, 0),
+    totalStaffSalary: summaries.reduce((s, b) => s + b.staffSalary, 0),
+    totalPresentToday: summaries.reduce((s, b) => s + b.presentToday, 0),
+    totalAbsentToday:  summaries.reduce((s, b) => s + b.absentToday, 0),
   };
 }
 

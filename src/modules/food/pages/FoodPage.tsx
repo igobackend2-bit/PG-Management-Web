@@ -3,8 +3,8 @@ import { useBranchStore } from '../../../store/branchStore';
 import { useToast } from '../../../shared/hooks/useToast';
 import { supabase } from '../../../services/supabase';
 import {
-  fetchMealTracking, upsertMeal, fetchFoodPurchases, createFoodPurchase, deleteFoodPurchase,
-  MEAL_TYPES, type MealTracking, type FoodPurchase,
+  fetchFoodPurchases, createFoodPurchase, deleteFoodPurchase,
+  type FoodPurchase,
 } from '../services/food.service';
 import {
   fetchStockItems, createStockItem, updateStockItem, deleteStockItem,
@@ -14,7 +14,7 @@ import {
 } from '../services/kitchen.service';
 import './FoodPage.scss';
 
-type Tab = 'meals' | 'purchases' | 'kitchen';
+type Tab = 'purchases' | 'kitchen';
 
 const CURRENCY = (n: number) => '₹' + n.toLocaleString('en-IN');
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -30,25 +30,12 @@ async function uploadBill(file: File, branchId: string): Promise<string> {
   return data.publicUrl;
 }
 
-const MEAL_ICONS: Record<string, string> = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
-
 // ─── FoodPage ─────────────────────────────────────────────────────────────────
 export function FoodPage() {
   const { selectedBranch } = useBranchStore();
   const toast = useToast();
 
-  const [tab, setTab] = useState<Tab>('meals');
-
-  // ── Meal state ──────────────────────────────────────────────────────────────
-  const [mealDate, setMealDate]   = useState(todayStr);
-  const [mealData, setMealData]   = useState<MealTracking[]>([]);
-  const [mealForm, setMealForm]   = useState<Record<string, { count: string; cost: string }>>({
-    breakfast: { count: '0', cost: '' },
-    lunch:     { count: '0', cost: '' },
-    dinner:    { count: '0', cost: '' },
-  });
-  const [loadingMeals, setLoadingMeals] = useState(false);
-  const [savingMeals, setSavingMeals]   = useState(false);
+  const [tab, setTab] = useState<Tab>('purchases');
 
   // ── Purchases state ─────────────────────────────────────────────────────────
   const [purchases, setPurchases]           = useState<FoodPurchase[]>([]);
@@ -81,25 +68,6 @@ export function FoodPage() {
   });
 
   // ── Loaders ──────────────────────────────────────────────────────────────────
-  const loadMeals = useCallback(async () => {
-    if (!selectedBranch) return;
-    setLoadingMeals(true);
-    try {
-      const data = await fetchMealTracking(selectedBranch.id, mealDate);
-      setMealData(data);
-      const next: typeof mealForm = {
-        breakfast: { count: '0', cost: '' },
-        lunch:     { count: '0', cost: '' },
-        dinner:    { count: '0', cost: '' },
-      };
-      data.forEach((m) => {
-        next[m.meal_type] = { count: String(m.count), cost: m.cost != null ? String(m.cost) : '' };
-      });
-      setMealForm(next);
-    } catch { toast.error('Failed to load meal data.'); }
-    finally { setLoadingMeals(false); }
-  }, [selectedBranch, mealDate]);
-
   const loadPurchases = useCallback(async () => {
     if (!selectedBranch) return;
     setLoadingPurch(true);
@@ -122,27 +90,8 @@ export function FoodPage() {
     finally { setLoadingStock(false); }
   }, [selectedBranch]);
 
-  useEffect(() => { if (tab === 'meals')     loadMeals();        }, [tab, loadMeals]);
   useEffect(() => { if (tab === 'purchases') loadPurchases();    }, [tab, loadPurchases]);
   useEffect(() => { if (tab === 'kitchen')   loadKitchenStock(); }, [tab, loadKitchenStock]);
-
-  // ── Meal save ─────────────────────────────────────────────────────────────
-  async function handleSaveMeals() {
-    if (!selectedBranch) return;
-    setSavingMeals(true);
-    try {
-      await Promise.all(
-        MEAL_TYPES.map((mt) =>
-          upsertMeal(selectedBranch.id, mealDate, mt,
-            Number(mealForm[mt].count) || 0,
-            mealForm[mt].cost ? Number(mealForm[mt].cost) : null)
-        )
-      );
-      toast.success('Meal data saved!');
-      loadMeals();
-    } catch { toast.error('Failed to save meal data.'); }
-    finally { setSavingMeals(false); }
-  }
 
   // ── Purchase save ─────────────────────────────────────────────────────────
   async function handleAddPurchase(e: React.FormEvent) {
@@ -273,8 +222,6 @@ export function FoodPage() {
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  const totalMealsToday = MEAL_TYPES.reduce((s, mt) => s + (Number(mealForm[mt].count) || 0), 0);
-  const totalCostToday  = MEAL_TYPES.reduce((s, mt) => s + (Number(mealForm[mt].cost) || 0), 0);
   const totalPurchases  = purchases.reduce((s, p) => s + p.total, 0);
   const lowStockItems   = stockItems.filter(i => i.current_qty <= i.low_stock_threshold);
   const outOfStockItems = stockItems.filter(i => i.current_qty === 0);
@@ -305,65 +252,12 @@ export function FoodPage() {
       </div>
 
       <div className="tab-bar">
-        <button className={`tab-btn ${tab === 'meals' ? 'active' : ''}`}     onClick={() => setTab('meals')}>🍽 Meal Tracking</button>
         <button className={`tab-btn ${tab === 'purchases' ? 'active' : ''}`} onClick={() => setTab('purchases')}>🛒 Purchases</button>
         <button className={`tab-btn ${tab === 'kitchen' ? 'active' : ''}`}   onClick={() => setTab('kitchen')}>
           📦 Kitchen Stock
           {lowStockItems.length > 0 && <span className="tab-badge red">{lowStockItems.length}</span>}
         </button>
       </div>
-
-      {/* ── MEAL TRACKING TAB ────────────────────────────────────────────────── */}
-      {tab === 'meals' && (
-        <>
-          <div className="controls-bar">
-            <label>Date:</label>
-            <input type="date" value={mealDate} onChange={(e) => setMealDate(e.target.value)} max={todayStr()} />
-          </div>
-
-          <div className="stats-row">
-            <div className="stat-card blue"><div className="stat-value">{totalMealsToday}</div><div className="stat-label">Total Meals</div></div>
-            <div className="stat-card green"><div className="stat-value">{mealForm.breakfast.count}</div><div className="stat-label">Breakfast</div></div>
-            <div className="stat-card yellow"><div className="stat-value">{mealForm.lunch.count}</div><div className="stat-label">Lunch</div></div>
-            <div className="stat-card purple"><div className="stat-value">{mealForm.dinner.count}</div><div className="stat-label">Dinner</div></div>
-          </div>
-
-          {loadingMeals ? (
-            <div className="loading-wrap"><span className="loader" /></div>
-          ) : (
-            <div className="meal-grid">
-              {MEAL_TYPES.map((mt) => (
-                <div key={mt} className="meal-card">
-                  <div className="meal-icon">{MEAL_ICONS[mt]}</div>
-                  <div className="meal-title">{mt.charAt(0).toUpperCase() + mt.slice(1)}</div>
-                  <div className="meal-fields">
-                    <div className="meal-field">
-                      <label>Plates Served</label>
-                      <input
-                        type="number" min="0" value={mealForm[mt].count}
-                        onChange={(e) => setMealForm((prev) => ({ ...prev, [mt]: { ...prev[mt], count: e.target.value } }))}
-                      />
-                    </div>
-                    <div className="meal-field">
-                      <label>Cost (₹)</label>
-                      <input
-                        type="number" min="0" value={mealForm[mt].cost} placeholder="0"
-                        onChange={(e) => setMealForm((prev) => ({ ...prev, [mt]: { ...prev[mt], cost: e.target.value } }))}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <div className="meal-save-row">
-                <div className="meal-total">Total Cost: <strong>{CURRENCY(totalCostToday)}</strong></div>
-                <button className="btn-add" onClick={handleSaveMeals} disabled={savingMeals}>
-                  {savingMeals ? 'Saving…' : '💾 Save Meal Data'}
-                </button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
 
       {/* ── PURCHASES TAB ─────────────────────────────────────────────────────── */}
       {tab === 'purchases' && (

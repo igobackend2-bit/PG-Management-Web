@@ -32,15 +32,28 @@ function App() {
       return;
     }
 
+    // getSession() only reads the cached token from localStorage — it does NOT
+    // verify it against the server, so an expired/revoked session still looks
+    // "valid" and the persisted Zustand auth state keeps the user "logged in"
+    // while every DB write silently fails RLS. Validate with getUser() to be sure.
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
-        if (session?.user) setUser(mapSessionUser(session.user));
-        else clearUser();
+      .then(async ({ data: { session } }) => {
+        if (!session?.user) { clearUser(); return; }
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) {
+          // Stale/invalid token — purge it so the app bounces to /login cleanly.
+          await supabase.auth.signOut();
+          clearUser();
+        } else {
+          setUser(mapSessionUser(data.user));
+        }
       })
       .catch(() => clearUser());
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED' && !session) { clearUser(); return; }
+      if (event === 'SIGNED_OUT') { clearUser(); return; }
       if (session?.user) setUser(mapSessionUser(session.user));
       else clearUser();
     });

@@ -58,9 +58,9 @@ CREATE TABLE beds (
 -- ─── Tenants ──────────────────────────────────────────────────────────────────
 CREATE TABLE tenants (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  branch_id       UUID NOT NULL REFERENCES branches(id),
-  room_id         UUID REFERENCES rooms(id),
-  bed_id          UUID REFERENCES beds(id),
+  branch_id       UUID NOT NULL REFERENCES branches(id) ON DELETE CASCADE,
+  room_id         UUID REFERENCES rooms(id) ON DELETE SET NULL,
+  bed_id          UUID REFERENCES beds(id) ON DELETE SET NULL,
   name            TEXT NOT NULL,
   phone           TEXT,
   email           TEXT,
